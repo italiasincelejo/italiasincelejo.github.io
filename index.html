@@ -691,6 +691,11 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
 .closedBar{color:#ffe100!important;background:rgba(255,214,0,.13)!important;border-bottom-color:rgba(255,225,0,.55)!important;font-weight:700!important}
 .closedBar .dot{background:#ffe100!important;box-shadow:0 0 10px rgba(255,225,0,.8)}
 .closedNote{color:#ffe100!important;background:rgba(255,214,0,.1)!important;border-color:rgba(255,225,0,.55)!important}
+
+.closedBar .glint{background:linear-gradient(110deg,#ffe100 0%,#ffe100 40%,#fffbe0 48%,#ffffff 50%,#fffbe0 52%,#ffe100 60%,#ffe100 100%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 2.4s linear infinite}
+.closedBar .dot{animation:blinkDot 1.6s ease-in-out infinite}
+@keyframes blinkDot{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.closedBar .glint,.closedBar .dot{animation:none}}
 </style>
 </head>
 <body>
@@ -2009,7 +2014,9 @@ function isOpen() {
 }
 function paintHours() {
   const open = isOpen();
-  $('#closedBar').innerHTML = open ? '' : `<span class="dot"></span>Cerrado ahora · Atendemos de ${HORARIO.texto}`;
+  let m = 0; try { m = bogotaMin(); } catch(e) {}
+  const cuando = m >= HORARIO.cierra ? 'Abrimos mañana a las 5:00 p. m.' : 'Abrimos hoy a las 5:00 p. m.';
+  $('#closedBar').innerHTML = open ? '' : `<span class="dot"></span><span class="glint">${cuando} · Deja tu pedido listo</span>`;
   $('#closedBar').classList.toggle('show', !open);
   $('#closedNote').textContent = open ? '' : `Estamos cerrados ahora. Puedes enviar tu pedido y te respondemos al abrir (${HORARIO.texto}).`;
   $('#closedNote').classList.toggle('show', !open);
