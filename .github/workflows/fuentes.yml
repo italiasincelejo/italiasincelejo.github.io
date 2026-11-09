@@ -1,25 +1,27 @@
-name: fuentes
+name: voz
 on:
   push:
     branches: [fuentes]
 permissions:
   contents: write
 jobs:
-  bajar:
+  voz:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Descargar fuentes de Google Fonts
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar voz (Kokoro, código abierto Apache-2.0)
         run: |
-          mkdir -p fonts
-          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
-          curl -sSL -A "$UA" "https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700;800&family=Kaushan+Script&display=swap" -o fonts/fonts.css
-          grep -o 'https://fonts.gstatic.com[^)]*' fonts/fonts.css | sort -u | while read u; do curl -sSL "$u" -o "fonts/$(basename "$u")"; done
-          ls -la fonts
+          sudo apt-get update -qq && sudo apt-get install -y -qq espeak-ng
+          pip install -q "kokoro>=0.9.4" soundfile torch --extra-index-url https://download.pytorch.org/whl/cpu
+      - name: Generar las frases
+        run: python voz/generar.py
       - name: Guardar
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add fonts
-          git commit -m "Fuentes para el video" || true
+          git add voz/*.wav
+          git commit -m "Voz del reel" || true
           git push
