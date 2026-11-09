@@ -673,6 +673,19 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
 
 .orderNo{display:inline-block;margin:-2px auto 4px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);font:800 16px var(--ui);letter-spacing:.06em;color:#fff}
 .orderNo:empty{display:none}
+
+/* v17 · tamaño de la pizza siempre visible */
+.shine{font-weight:700;color:#fff;background:linear-gradient(110deg,#fff 0%,#fff 38%,#ff1e2d 46%,#ffd0d3 50%,#ff1e2d 54%,#fff 62%,#fff 100%);background-size:260% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 2.8s linear infinite}
+@keyframes shine{0%{background-position:100% 0}100%{background-position:-60% 0}}
+.sizeTag{position:absolute;left:2%;top:6%;z-index:7;display:flex;flex-direction:column;align-items:flex-start;padding:7px 12px 8px;border-radius:14px;background:linear-gradient(180deg,#ff2b38,#d9001a);color:#fff;box-shadow:0 10px 24px rgba(255,30,45,.45),inset 0 1px 0 rgba(255,255,255,.3);pointer-events:none;animation:floatTag 3s ease-in-out infinite}
+.sizeTag b{font:800 22px/1 var(--ui);letter-spacing:-.01em}
+.sizeTag span{font:600 11.5px/1.2 var(--ui);opacity:.95;margin-top:3px;white-space:nowrap}
+.sizeTag .ruler{position:absolute;left:12px;right:12px;bottom:-9px;height:6px;border:2px solid rgba(255,255,255,.75);border-top:0;border-radius:0 0 3px 3px;opacity:.9}
+.sizeTag::after{content:'';position:absolute;right:-6px;bottom:14px;width:12px;height:12px;background:#d9001a;transform:rotate(45deg);border-radius:2px}
+@keyframes floatTag{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(-1deg)}}
+.baking ~ .sizeTag,.stage3d:has(.baked) .sizeTag{opacity:0;transition:opacity .3s}
+@media (max-width:820px){.sizeTag{left:1%;top:2%;padding:5px 10px 6px;border-radius:12px}.sizeTag b{font-size:18px}.sizeTag span{font-size:10.5px}}
+@media (prefers-reduced-motion:reduce){.shine,.sizeTag{animation:none}}
 </style>
 </head>
 <body>
@@ -725,6 +738,7 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
       <div class="pill" id="hint">Toca un ingrediente para agregarlo. Tócalo otra vez para cambiarlo o quitarlo.</div>
       <button class="casaBtn" id="casaBtn"><i data-i="layers"></i>Empieza con una de la casa</button>
       <div class="stage3d" id="stage3d">
+        <div class="sizeTag" aria-hidden="true"><b>27 cm</b><span>Personal · 6 porciones</span><i class="ruler"></i></div>
         <div class="tilt" id="tilt">
           <div class="spin">
             <div class="cast"></div>
@@ -871,7 +885,7 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
     <div class="nikoLine"><b>Niko</b><span id="introTxt"></span><span class="cur"></span></div>
     <div class="eyebrow">ITALIA · SINCELEJO</div>
     <h1>¿Y si armas<br>tu pizza<br><em>a tu manera?</em></h1>
-    <p>Pizza personal de 27 cm. Elige cada ingrediente, mírala salir del horno y pídela directo por WhatsApp.</p>
+    <p><span class="shine">Pizza personal de 27 cm.</span> Elige cada ingrediente, mírala salir del horno y pídela directo por WhatsApp.</p>
     <button class="btn go" id="introGo">Empezar<i data-i="arrow"></i></button>
     <div class="feats"><span class="feat"><i data-i="layers"></i>27 ingredientes</span><span class="feat"><i data-i="tag"></i>Precio en tiempo real</span><span class="feat"><i data-i="chat"></i>Pedido por WhatsApp</span></div>
   </div>
