@@ -1,0 +1,25 @@
+name: fuentes
+on:
+  push:
+    branches: [fuentes]
+permissions:
+  contents: write
+jobs:
+  bajar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Descargar fuentes de Google Fonts
+        run: |
+          mkdir -p fonts
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+          curl -sSL -A "$UA" "https://fonts.googleapis.com/css2?family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700;800&family=Kaushan+Script&display=swap" -o fonts/fonts.css
+          grep -o 'https://fonts.gstatic.com[^)]*' fonts/fonts.css | sort -u | while read u; do curl -sSL "$u" -o "fonts/$(basename "$u")"; done
+          ls -la fonts
+      - name: Guardar
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add fonts
+          git commit -m "Fuentes para el video" || true
+          git push
