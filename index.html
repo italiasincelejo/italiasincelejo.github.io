@@ -703,9 +703,9 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
 .lite .dish .phCard{filter:none}
 .hasPhoto .piece .ph{filter:drop-shadow(0 1.2px 1.2px rgba(0,0,0,.45))}
 .lite .hasPhoto .piece .ph{filter:none}
-#pizza .baseImg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;border-radius:50%;transform:translateZ(8.1px);clip-path:circle(0% at 50% 50%);transition:clip-path .9s cubic-bezier(.2,.8,.2,1);pointer-events:none}
-#pizza.on-cheese .baseImg{clip-path:circle(50% at 50% 50%)}
-#pizza.hasPhoto .cheese,#pizza.hasPhoto.on-cheese .sauce{visibility:hidden}
+#pizza .baseImg,.pzClone .baseImg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;border-radius:50%;transform:translateZ(8.1px);clip-path:circle(0% at 50% 50%);transition:clip-path .9s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+#pizza.on-cheese .baseImg,.pzClone.on-cheese .baseImg{clip-path:circle(50% at 50% 50%)}
+#pizza.hasPhoto .cheese,#pizza.hasPhoto.on-cheese .sauce,.pzClone.hasPhoto .cheese,.pzClone.hasPhoto.on-cheese .sauce{visibility:hidden}
 .baked .baseImg{filter:saturate(1.12) brightness(.95) sepia(.1)}
 .lite .baked .baseImg{filter:none}
 </style>
