@@ -1,22 +1,23 @@
-name: fotos
+name: prueba-vista-previa
 on:
   push:
     branches: [fuentes]
 permissions:
   contents: write
 jobs:
-  fotos:
+  probar:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Descargar fotos de los ingredientes
-        shell: bash
+      - name: Pedir las páginas como WhatsApp
         run: |
-          while read name url; do curl -sSL -A "Mozilla/5.0" "$url" -o "fotos/$name.png"; echo "$name $(stat -c %s fotos/$name.png) $(file -b fotos/$name.png | cut -c1-40)"; done < <(cat fotos/urls2.txt fotos/urls3.txt fotos/urls4.txt)
+          mkdir -p prueba; UA="WhatsApp/2.24.20.80 A"
+          for u in "https://italiasincelejo.github.io/" "https://italiasincelejo.github.io/og-italia.jpg?v=2" "https://italiasincelejo.github.io/og-image.png" "https://einerjoseperez2021-debug.github.io/italia-arma-tu-pizza/" "https://einerjoseperez2021-debug.github.io/italia-arma-tu-pizza/og-image.png"; do
+            echo "=== $u" >> prueba/resultado.txt
+            curl -sS -A "$UA" -o /tmp/body -D - -w "tiempo %{time_total}s bytes %{size_download}\n" "$u" | grep -iE "^HTTP|content-type|content-length|location|cache-control|tiempo" >> prueba/resultado.txt
+            head -c 1500 /tmp/body | grep -o '<meta[^>]*og:[^>]*>' >> prueba/resultado.txt || true
+          done
       - name: Guardar
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@users.noreply.github.com"
-          git add fotos/*.png
-          git commit -m "Fotos de ingredientes" || true
-          git push
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git add prueba; git commit -m "Prueba vista previa" || true; git push
