@@ -1,0 +1,34 @@
+=== https://italiasincelejo.github.io/
+HTTP/2 200 
+content-type: text/html; charset=utf-8
+cache-control: max-age=600
+content-length: 213469
+tiempo 0.231051s bytes 213469
+=== https://italiasincelejo.github.io/og-italia.jpg?v=2
+HTTP/2 200 
+content-type: image/jpeg
+cache-control: max-age=600
+content-length: 110665
+tiempo 0.125236s bytes 110665
+=== https://italiasincelejo.github.io/og-image.png
+HTTP/2 200 
+content-type: image/png
+cache-control: max-age=600
+content-length: 227334
+tiempo 0.157313s bytes 227334
+=== https://einerjoseperez2021-debug.github.io/italia-arma-tu-pizza/
+HTTP/2 200 
+content-type: text/html; charset=utf-8
+cache-control: max-age=600
+content-length: 1188
+tiempo 0.128601s bytes 1188
+<meta property="og:title" content="Arma tu pizza · Italia Sincelejo">
+<meta property="og:description" content="Elige tus ingredientes, mírala salir del horno y pídela por WhatsApp.">
+<meta property="og:image" content="https://italiasincelejo.github.io/og-image.png">
+<meta property="og:url" content="https://italiasincelejo.github.io/">
+=== https://einerjoseperez2021-debug.github.io/italia-arma-tu-pizza/og-image.png
+HTTP/2 200 
+content-type: image/png
+cache-control: max-age=600
+content-length: 227334
+tiempo 0.154944s bytes 227334
