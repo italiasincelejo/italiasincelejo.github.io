@@ -696,6 +696,18 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
 .closedBar .dot{animation:blinkDot 1.6s ease-in-out infinite}
 @keyframes blinkDot{0%,100%{opacity:1}50%{opacity:.35}}
 @media (prefers-reduced-motion:reduce){.closedBar .glint,.closedBar .dot{animation:none}}
+
+/* v20 · fotos realistas de ingredientes */
+.piece .ph,.ghost .ph,.isart .ph,.cart3 .ph{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
+.dish .phCard{position:absolute;left:8%;top:0;width:84%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 4px rgba(0,0,0,.5));pointer-events:none}
+.lite .dish .phCard{filter:none}
+.hasPhoto .piece .ph{filter:drop-shadow(0 1.2px 1.2px rgba(0,0,0,.45))}
+.lite .hasPhoto .piece .ph{filter:none}
+#pizza .baseImg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;border-radius:50%;transform:translateZ(8.1px);clip-path:circle(0% at 50% 50%);transition:clip-path .9s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+#pizza.on-cheese .baseImg{clip-path:circle(50% at 50% 50%)}
+#pizza.hasPhoto .cheese,#pizza.hasPhoto.on-cheese .sauce{visibility:hidden}
+.baked .baseImg{filter:saturate(1.12) brightness(.95) sepia(.1)}
+.lite .baked .baseImg{filter:none}
 </style>
 </head>
 <body>
@@ -760,6 +772,7 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
               <div class="dough"></div>
               <div class="sauce"></div>
               <div class="cheese" id="cheese"></div>
+              <img class="baseImg" id="baseImg" alt="" draggable="false">
               <div class="spots" id="spots"></div>
               <div class="pieces" id="pieces"></div>
               <div class="oregano" id="oregano"></div>
@@ -965,6 +978,11 @@ const shakerSVG = () => S(`
   <text x="30" y="54" text-anchor="middle" font-family="Anton, sans-serif" font-size="6.5" letter-spacing=".4" fill="#fff">HIERBAS</text>`, '0 0 60 140');
 
 
+/* Fotos realistas: donde hay foto, reemplaza el dibujo del ingrediente (en la pizza, en la tarjeta y al arrastrar) */
+const PHOTOS = {"aceitunas_1": "img/aceitunas_1.webp", "aceitunas_pila": "img/aceitunas_pila.webp", "balsamico_pila": "img/balsamico_pila.webp", "base": "img/base.webp", "bufala_1": "img/bufala_1.webp", "bufala_pila": "img/bufala_pila.webp", "burrata_1": "img/burrata_1.webp", "burrata_pila": "img/burrata_pila.webp", "butifarra_1": "img/butifarra_1.webp", "butifarra_pila": "img/butifarra_pila.webp", "carne_1": "img/carne_1.webp", "carne_pila": "img/carne_pila.webp", "cebolla_1": "img/cebolla_1.webp", "cebolla_pila": "img/cebolla_pila.webp", "champinones_1": "img/champinones_1.webp", "champinones_pila": "img/champinones_pila.webp", "chorizo_1": "img/chorizo_1.webp", "chorizo_pila": "img/chorizo_pila.webp", "jamon_1": "img/jamon_1.webp", "jamon_pila": "img/jamon_pila.webp", "maiz_1": "img/maiz_1.webp", "maiz_pila": "img/maiz_pila.webp", "miel_pila": "img/miel_pila.webp", "parmesano_pila": "img/parmesano_pila.webp", "pepperoni_1": "img/pepperoni_1.webp", "pepperoni_pila": "img/pepperoni_pila.webp", "picante_pila": "img/picante_pila.webp", "pimenton_1": "img/pimenton_1.webp", "pimenton_pila": "img/pimenton_pila.webp", "pina_1": "img/pina_1.webp", "pina_pila": "img/pina_pila.webp", "pollo_1": "img/pollo_1.webp", "pollo_pila": "img/pollo_pila.webp", "porchetta_1": "img/porchetta_1.webp", "porchetta_pila": "img/porchetta_pila.webp", "quesoextra_pila": "img/quesoextra_pila.webp", "ranchera_1": "img/ranchera_1.webp", "ranchera_pila": "img/ranchera_pila.webp", "rugula_1": "img/rugula_1.webp", "rugula_pila": "img/rugula_pila.webp", "salami_1": "img/salami_1.webp", "salami_pila": "img/salami_pila.webp", "serrano_1": "img/serrano_1.webp", "serrano_pila": "img/serrano_pila.webp", "tocineta_1": "img/tocineta_1.webp", "tocineta_pila": "img/tocineta_pila.webp", "tomate_1": "img/tomate_1.webp", "tomate_pila": "img/tomate_pila.webp", "uvas_1": "img/uvas_1.webp", "uvas_pila": "img/uvas_pila.webp"};
+for (const id of Object.keys(PHOTOS).filter(k => k.endsWith('_1')).map(k => k.slice(0, -2))) {
+  const src = PHOTOS[id + '_1']; ART[id] = () => `<img class="ph" src="${src}" alt="" draggable="false">`;
+}
 Object.assign(ART, {
   butifarra: () => S(`<circle r="14" fill="#d8a596"/><circle r="14" fill="none" stroke="#9c5d4c" stroke-width="2"/><circle cx="-5" cy="-4" r="1.8" fill="#fff3ea"/><circle cx="4" cy="5" r="1.6" fill="#fff3ea"/><circle cx="5" cy="-6" r="1" fill="#4a2a20"/><circle cx="-6" cy="5" r="1" fill="#4a2a20"/><circle cx="1" cy="0" r=".9" fill="#4a2a20"/>${HL(-4,-6,4.5,1.8)}`),
   porchetta: () => S(`<circle r="17" fill="#e8b0a2"/><circle r="16" fill="none" stroke="#7a3e1a" stroke-width="3.5"/><path d="M0 0 m-2 0 a2 2 0 1 1 4 0 a5 5 0 1 1 -9 1 a8 8 0 1 1 15 -2" fill="none" stroke="#fbeee6" stroke-width="2.2" stroke-linecap="round"/>${HL(-6,-8,6,2.2)}`),
@@ -1006,30 +1024,30 @@ const ICON = {   // íconos pequeños para la base en la bandeja del celular
 
 /* ================= Adiciones (menú de Italia) ================= */
 const TOPS = {
-  pepperoni:{name:'Pepperoni', cat:'proteina', grp:'carnes', n:14, size:11},
-  jamon:{name:'Jamón', cat:'proteina', grp:'carnes', n:12, size:11},
-  pollo:{name:'Pollo', cat:'proteina', grp:'carnes', n:16, size:9.5},
-  tocineta:{name:'Tocineta', cat:'proteina', grp:'carnes', n:11, size:12},
-  chorizo:{name:'Chorizo', cat:'proteina', grp:'carnes', n:15, size:9.5},
-  salami:{name:'Salami', cat:'proteina', grp:'carnes', n:13, size:10.5},
-  ranchera:{name:'Ranchera', cat:'proteina', grp:'carnes', n:16, size:8.5},
-  carne:{name:'Carne molida', cat:'proteina', grp:'carnes', n:24, size:7},
-  butifarra:{name:'Butifarra', cat:'proteina', grp:'carnes', n:16, size:8.5},
+  pepperoni:{name:'Pepperoni', cat:'proteina', grp:'carnes', n:13, size:13.5},
+  jamon:{name:'Jamón', cat:'proteina', grp:'carnes', n:10, size:14.5},
+  pollo:{name:'Pollo', cat:'proteina', grp:'carnes', n:14, size:11},
+  tocineta:{name:'Tocineta', cat:'proteina', grp:'carnes', n:10, size:14},
+  chorizo:{name:'Chorizo', cat:'proteina', grp:'carnes', n:13, size:11.5},
+  salami:{name:'Salami', cat:'proteina', grp:'carnes', n:11, size:13},
+  ranchera:{name:'Ranchera', cat:'proteina', grp:'carnes', n:14, size:9.5},
+  carne:{name:'Carne molida', cat:'proteina', grp:'carnes', n:22, size:7.5},
+  butifarra:{name:'Butifarra', cat:'proteina', grp:'carnes', n:13, size:11},
   quesoextra:{name:'Queso extra', cat:'queso', grp:'quesos', layer:'cheese'},
   parmesano:{name:'Parmesano', cat:'queso', grp:'quesos', layer:'parm'},
-  bufala:{name:'Queso de búfala', cat:'premium', grp:'quesos', n:9, size:12.5},
-  burrata:{name:'Burrata', cat:'premium', grp:'quesos', n:5, size:16},
-  porchetta:{name:'Porchetta', cat:'premium', grp:'quesos', n:10, size:12.5},
-  serrano:{name:'Jamón serrano', cat:'premium', grp:'quesos', n:9, size:14},
-  champinones:{name:'Champiñones', cat:'vegetal', grp:'veg', n:15, size:9.5},
-  pimenton:{name:'Pimentón', cat:'vegetal', grp:'veg', n:16, size:9.5},
-  cebolla:{name:'Cebolla roja', cat:'vegetal', grp:'veg', n:14, size:9.5},
-  tomate:{name:'Tomate fresco', cat:'vegetal', grp:'veg', n:9, size:13},
-  aceitunas:{name:'Aceitunas', cat:'vegetal', grp:'veg', n:19, size:6.5},
-  maiz:{name:'Maíz', cat:'vegetal', grp:'veg', n:38, size:3.6},
-  rugula:{name:'Rúgula', cat:'vegetal', grp:'veg', n:15, size:9.5},
-  pina:{name:'Piña caramelizada', cat:'fruta', grp:'extras', n:15, size:8},
-  uvas:{name:'Uvas pasas', cat:'fruta', grp:'extras', n:24, size:4.6},
+  bufala:{name:'Queso de búfala', cat:'premium', grp:'quesos', n:8, size:13},
+  burrata:{name:'Burrata', cat:'premium', grp:'quesos', n:5, size:17},
+  porchetta:{name:'Porchetta', cat:'premium', grp:'quesos', n:9, size:14},
+  serrano:{name:'Jamón serrano', cat:'premium', grp:'quesos', n:8, size:16},
+  champinones:{name:'Champiñones', cat:'vegetal', grp:'veg', n:13, size:11.5},
+  pimenton:{name:'Pimentón', cat:'vegetal', grp:'veg', n:14, size:12.5},
+  cebolla:{name:'Cebolla roja', cat:'vegetal', grp:'veg', n:12, size:12},
+  tomate:{name:'Tomate fresco', cat:'vegetal', grp:'veg', n:8, size:14},
+  aceitunas:{name:'Aceitunas', cat:'vegetal', grp:'veg', n:17, size:7.5},
+  maiz:{name:'Maíz', cat:'vegetal', grp:'veg', n:20, size:6},
+  rugula:{name:'Rúgula', cat:'vegetal', grp:'veg', n:13, size:13},
+  pina:{name:'Piña caramelizada', cat:'fruta', grp:'extras', n:13, size:10},
+  uvas:{name:'Uvas pasas', cat:'fruta', grp:'extras', n:20, size:5.5},
   picante:{name:'Salsa picante', cat:'salsa', grp:'extras', drizzle:'#d7261b'},
   miel:{name:'Miel picante', cat:'salsa', grp:'extras', drizzle:'#e8a420'},
   balsamico:{name:'Reducción de balsámico', cat:'salsa', grp:'extras', drizzle:'#3b1d12'}
@@ -1096,6 +1114,9 @@ const isMobile = () => matchMedia('(max-width:820px)').matches;
 const st = {sauce:false, cheese:false, oregano:false, tops:{}, baked:false, history:[], sound:true, cart:[], editing:null, last:null, tab:'carnes', house:null, drinks:{}, entrega:'domicilio', pago:'', sentPending:false};
 const $ = s => document.querySelector(s);
 const pizza = $('#pizza'), piecesEl = $('#pieces'), tilt = $('#tilt');
+if (PHOTOS.base) { $('#baseImg').src = PHOTOS.base; $('#baseImg').decoding = 'async'; pizza.classList.add('hasPhoto'); }
+// las fotos de las piezas se cargan en segundo plano para que caigan al instante
+Object.entries(PHOTOS).filter(([k]) => k.endsWith('_1')).forEach(([, src]) => { const i = new Image(); i.src = src; });
 
 /* ================= Construcción de la interfaz ================= */
 $('#boardLayers').outerHTML = Array.from({length:7},(_,i)=>`<div class="bl" style="transform:translateZ(${-2-i*2}px);background:${i===6?'#2e1908':'#4a2a11'}"></div>`).join('');
@@ -1106,7 +1127,8 @@ $('#cuts').innerHTML = [0,60,120].map(a => { const r=47, rad=a*Math.PI/180, dx=M
 const dishPos = [[18,32,-20],[48,24,25],[78,34,60],[30,70,110],[62,72,-50],[88,74,15]];
 function topCard(id) {
   const t = TOPS[id], el = document.createElement('div'); el.className='ing'; el.dataset.id=id; el.dataset.grp=t.grp;
-  const dish = dishPos.map(([x,y,r]) => `<div class="p" style="left:${x}%;top:${y}%;transform:translate(-50%,-50%) rotate(${r}deg)">${ART[id]()}</div>`).join('');
+  const dish = PHOTOS[id + '_pila'] ? `<img class="phCard" src="${PHOTOS[id + '_pila']}" alt="" draggable="false">`
+    : dishPos.map(([x,y,r]) => `<div class="p" style="left:${x}%;top:${y}%;transform:translate(-50%,-50%) rotate(${r}deg)">${ART[id]()}</div>`).join('');
   el.innerHTML = `<div class="dishWrap"><div class="dish">${dish}</div></div><div><div class="nm">${t.name}</div><div class="pr">+ ${fmt(price(id))}</div></div><div class="badge">${I('check')}</div>${FAVORITOS.ingredientes.includes(id)?'<em class="fav">Favorito</em>':''}`;
   el.addEventListener('pointerdown', e => startDrag(e, el, 'top', id, ART[id](), 58));
   return el;
@@ -2078,7 +2100,8 @@ function pizzaSVG(tops) {   // vista cenital de la pizza, armada con los mismos 
     <defs><radialGradient id="shCrust" cx="50%" cy="50%" r="50%"><stop offset=".74" stop-color="#f6dfae"/><stop offset=".8" stop-color="#efc27a"/><stop offset=".87" stop-color="#dc9a4a"/><stop offset=".94" stop-color="#bd7531"/><stop offset="1" stop-color="#9a5821"/></radialGradient>
     <radialGradient id="shSauce" cx="40%" cy="35%" r="65%"><stop offset="0" stop-color="#d23a24"/><stop offset="1" stop-color="#a51d12"/></radialGradient></defs>
     <circle cx="50" cy="50" r="50" fill="url(#shCrust)"/><circle cx="50" cy="50" r="41" fill="url(#shSauce)"/>
-    <svg x="10" y="10" width="80" height="80" viewBox="0 0 100 100">${$('#cheese svg') ? $('#cheese svg').innerHTML : ''}</svg>`;
+    <svg x="10" y="10" width="80" height="80" viewBox="0 0 100 100">${$('#cheese svg') ? $('#cheese svg').innerHTML : ''}</svg>
+    ${PHOTOS.base ? `<image href="${PHOTOS.base}" x="0" y="0" width="100" height="100" preserveAspectRatio="none"/>` : ''}`;
   const order = Object.keys(tops).sort((a,b) => (TOPS[a].layer?0:1) - (TOPS[b].layer?0:1));
   for (const id of order) for (let k = 0; k < tops[id]; k++) {
     const t = TOPS[id];
@@ -2090,7 +2113,9 @@ function pizzaSVG(tops) {   // vista cenital de la pizza, armada con los mismos 
     const n = k ? Math.ceil(t.n*.6) : t.n, off = TOP_IDS.indexOf(id)*53 + k*29, art = ART[id]();
     for (let i = 0; i < n; i++) {
       const r = 35.5*Math.sqrt((i+.5)/n), th = (i*137.508 + off)*Math.PI/180, x = 50 + r*Math.cos(th), y = 50 + r*Math.sin(th), sz = t.size;
-      s += `<g transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${(i*97 + off*7)%360})">${art.replace('<svg ', `<svg x="${(-sz/2).toFixed(2)}" y="${(-sz/2).toFixed(2)}" width="${sz}" height="${sz}" `)}</g>`;
+      const inner = PHOTOS[id + '_1'] ? `<image href="${PHOTOS[id + '_1']}" x="${(-sz/2).toFixed(2)}" y="${(-sz/2).toFixed(2)}" width="${sz}" height="${sz}" preserveAspectRatio="xMidYMid meet"/>`
+        : art.replace('<svg ', `<svg x="${(-sz/2).toFixed(2)}" y="${(-sz/2).toFixed(2)}" width="${sz}" height="${sz}" `);
+      s += `<g transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${(i*97 + off*7)%360})">${inner}</g>`;
     }
   }
   const herbs = $('#oregano svg'); if (herbs) s += `<svg x="0" y="0" width="100" height="100" viewBox="0 0 100 100">${herbs.innerHTML}</svg>`;
@@ -2101,13 +2126,21 @@ function wrapText(ctx, text, maxW) {
   for (const w of words) { const tst = line ? line + ' ' + w : w; if (ctx.measureText(tst).width > maxW && line) { lines.push(line); line = w; } else line = tst; }
   if (line) lines.push(line); return lines;
 }
+const DATA_CACHE = {};
+async function asData(src) {   // las fotos se incrustan para que la imagen para compartir las pueda dibujar
+  if (!src || src.startsWith('data:')) return src;
+  if (!DATA_CACHE[src]) DATA_CACHE[src] = await fetch(src).then(r => r.blob()).then(b => new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(b); })).catch(() => '');
+  return DATA_CACHE[src];
+}
 async function sharePizza(origen) {
   const it = (Object.keys(st.tops).length || st.house) ? {tops: st.tops, house: st.house} : (st.cart[st.last ?? st.cart.length-1] || st.cart[0]);
   if (!it) { toast('Arma una pizza primero'); return; }
   toast('Preparando la imagen…');
   try {
     await (document.fonts && document.fonts.ready);
-    const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(pizzaSVG(it.tops));
+    let svg = pizzaSVG(it.tops);
+    for (const src of new Set([...svg.matchAll(/href="(img\/[^"]+)"/g)].map(m => m[1]))) svg = svg.split(`href="${src}"`).join(`href="${await asData(src)}"`);
+    const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     await img.decode();
     const W = 1080, H = 1350, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
     ctx.fillStyle = '#0d0b0a'; ctx.fillRect(0,0,W,H);
