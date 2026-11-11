@@ -714,6 +714,13 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
 #pizza.hasPhoto .cheese,#pizza.hasPhoto.on-cheese .sauce,.pzClone.hasPhoto .cheese,.pzClone.hasPhoto.on-cheese .sauce{visibility:hidden}
 .baked .baseImg{filter:saturate(1.12) brightness(.95) sepia(.1)}
 .lite .baked .baseImg{filter:none}
+
+/* v24 · miércoles de descanso: tira que va rodando */
+.closedBar.rest.show{justify-content:flex-start;padding:7px 0!important}
+.closedBar .ticker{display:flex;width:max-content;animation:ticker 16s linear infinite}
+.closedBar .ticker span{padding-right:70px;white-space:nowrap;color:#ffe100;font-weight:800}
+@keyframes ticker{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@media (prefers-reduced-motion:reduce){.closedBar .ticker{animation-duration:40s}}
 </style>
 </head>
 <body>
@@ -1099,7 +1106,7 @@ function orderId() {
 const PAGOS = {llave:'Transferencia por llave', efectivo:'Efectivo', datafono:'Datáfono (Bold)'};
 /* Etiqueta "Favorito": se puede actualizar con lo que más se vende (datos de PostHog o de la caja). */
 const FAVORITOS = { ingredientes:['jamon','pollo','pepperoni'], casa:['alicia','italiana','lasanta'] };
-const HORARIO = { abre: 17*60, cierra: 23*60+30, texto: '5:00 p. m. a 11:30 p. m.' };
+const HORARIO = { abre: 17*60, cierra: 23*60+30, texto: '5:00 p. m. a 11:30 p. m.', descanso: 3 };   // descanso: 3 = miércoles (0 = domingo)
 const DIRECCION_LOCAL = 'Plaza Cultural de Majagual, Sincelejo';
 const BASES = [
   {id:'sauce', name:'Salsa de tomate', cls:'bottle', svg:bottleSVG, w:56, h:122},
@@ -1662,7 +1669,7 @@ function orderText() {
   if (domi) out.push(`Dirección: ${addr}`);
   out.push(st.pago==='llave' ? `Pago: Transferencia por llave ${LLAVE} (envío el comprobante por aquí)` : `Pago: ${PAGOS[st.pago] || ''}`, `Nombre: ${name}`);
   if (note) out.push(`Notas: ${note}`);
-  if (!isOpen()) out.push('', `(Lo envío fuera del horario de atención: ${HORARIO.texto})`);
+  if (!isOpen()) out.push('', esDescanso() ? '(Lo envío un miércoles; lo atienden el jueves desde las 5:00 p. m.)' : `(Lo envío fuera del horario de atención: ${HORARIO.texto})`);
   return out.join('\n');
 }
 const waUrl = () => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(orderText())}`;
@@ -2032,22 +2039,39 @@ paintSegs();
 
 /* ================= Horario de atención ================= */
 const HORA_PRUEBA = new URLSearchParams(location.search).get('hora');   // ?hora=cerrado o ?hora=abierto, solo para probar
+const DIA_PRUEBA = new URLSearchParams(location.search).get('dia');   // ?dia=0..6, solo para probar
 function bogotaMin() {
   const p = new Intl.DateTimeFormat('en-GB', {timeZone:'America/Bogota', hour:'2-digit', minute:'2-digit', hourCycle:'h23'}).formatToParts(new Date());
   return (+p.find(x=>x.type==='hour').value)*60 + (+p.find(x=>x.type==='minute').value);
 }
+function bogotaDia() {   // 0 = domingo … 6 = sábado, en hora de Colombia
+  if (DIA_PRUEBA !== null) return +DIA_PRUEBA;
+  const w = new Intl.DateTimeFormat('en-US', {timeZone:'America/Bogota', weekday:'short'}).format(new Date());
+  return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(w);
+}
+const esDescanso = () => { try { return bogotaDia() === HORARIO.descanso; } catch(e) { return false; } };
 function isOpen() {
   if (HORA_PRUEBA === 'cerrado') return false; if (HORA_PRUEBA === 'abierto') return true;
+  if (esDescanso()) return false;
   try { const m = bogotaMin(); return m >= HORARIO.abre && m < HORARIO.cierra; } catch(e) { return true; }
 }
 function paintHours() {
-  const open = isOpen();
-  let m = 0; try { m = bogotaMin(); } catch(e) {}
-  const cuando = m >= HORARIO.cierra ? 'Abrimos mañana a las 5:00 p. m.' : 'Abrimos hoy a las 5:00 p. m.';
-  $('#closedBar').innerHTML = open ? '' : `<span class="dot"></span><span class="glint">${cuando} · Deja tu pedido listo</span>`;
-  $('#closedBar').classList.toggle('show', !open);
-  $('#closedNote').textContent = open ? '' : `Estamos cerrados ahora. Puedes enviar tu pedido y te respondemos al abrir (${HORARIO.texto}).`;
-  $('#closedNote').classList.toggle('show', !open);
+  const open = isOpen(), bar = $('#closedBar');
+  let m = 0, dia = -1; try { m = bogotaMin(); dia = bogotaDia(); } catch(e) {}
+  bar.classList.toggle('show', !open);
+  bar.classList.toggle('rest', !open && esDescanso());
+  if (open) { bar.innerHTML = ''; $('#closedNote').textContent = ''; $('#closedNote').classList.remove('show'); return; }
+  if (esDescanso()) {   // miércoles: tira que va rodando
+    const msg = `Hoy miércoles no estamos en servicio · Te esperamos mañana jueves desde las 5:00 p. m. · Puedes dejar tu pedido listo`;
+    if (!bar.querySelector('.ticker')) bar.innerHTML = `<div class="ticker"><span>${msg}</span><span>${msg}</span></div>`;
+    $('#closedNote').textContent = 'Hoy miércoles no estamos en servicio. Puedes enviar tu pedido y te respondemos el jueves desde las 5:00 p. m.';
+  } else {
+    const manana = (dia + 1) % 7 === HORARIO.descanso ? 'el jueves' : 'mañana';
+    const cuando = m >= HORARIO.cierra ? `Abrimos ${manana} a las 5:00 p. m.` : 'Abrimos hoy a las 5:00 p. m.';
+    bar.innerHTML = `<span class="dot"></span><span class="glint">${cuando} · Deja tu pedido listo</span>`;
+    $('#closedNote').textContent = `Estamos cerrados ahora. Puedes enviar tu pedido y te respondemos al abrir (${HORARIO.texto}).`;
+  }
+  $('#closedNote').classList.add('show');
 }
 paintHours(); setInterval(paintHours, 60000);
 
