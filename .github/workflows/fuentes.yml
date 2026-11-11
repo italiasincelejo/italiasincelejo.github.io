@@ -10,8 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Descargar fotos de los ingredientes
+        shell: bash
         run: |
-          while read name url; do curl -sSL -A "Mozilla/5.0" "$url" -o "fotos/$name.png"; echo "$name $(stat -c %s fotos/$name.png) $(file -b fotos/$name.png | cut -c1-40)"; done < fotos/urls.txt
+          while read name url; do curl -sSL -A "Mozilla/5.0" "$url" -o "fotos/$name.png"; echo "$name $(stat -c %s fotos/$name.png) $(file -b fotos/$name.png | cut -c1-40)"; done < <(cat fotos/urls2.txt fotos/urls3.txt fotos/urls4.txt)
       - name: Guardar
         run: |
           git config user.name "github-actions"
