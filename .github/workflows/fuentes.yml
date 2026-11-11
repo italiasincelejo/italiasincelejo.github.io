@@ -1,27 +1,21 @@
-name: voz
+name: fotos
 on:
   push:
     branches: [fuentes]
 permissions:
   contents: write
 jobs:
-  voz:
+  fotos:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Instalar voz (Kokoro, código abierto Apache-2.0)
+      - name: Descargar fotos de los ingredientes
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq espeak-ng
-          pip install -q "kokoro>=0.9.4" soundfile torch --extra-index-url https://download.pytorch.org/whl/cpu
-      - name: Generar las frases
-        run: python voz/generar.py
+          while read name url; do curl -sSL -A "Mozilla/5.0" "$url" -o "fotos/$name.png"; echo "$name $(stat -c %s fotos/$name.png) $(file -b fotos/$name.png | cut -c1-40)"; done < fotos/urls.txt
       - name: Guardar
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add voz/*.wav
-          git commit -m "Voz del reel" || true
+          git add fotos/*.png
+          git commit -m "Fotos de ingredientes" || true
           git push
