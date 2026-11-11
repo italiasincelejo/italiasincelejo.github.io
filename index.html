@@ -993,9 +993,6 @@ const shakerSVG = () => S(`
 
 /* Fotos realistas: donde hay foto, reemplaza el dibujo del ingrediente (en la pizza, en la tarjeta y al arrastrar) */
 const PHOTOS = {"aceitunas_1": "img/aceitunas_1.webp", "aceitunas_pila": "img/aceitunas_pila.webp", "balsamico_pila": "img/balsamico_pila.webp", "base": "img/base.webp", "bufala_1": "img/bufala_1.webp", "bufala_pila": "img/bufala_pila.webp", "burrata_1": "img/burrata_1.webp", "burrata_pila": "img/burrata_pila.webp", "butifarra_1": "img/butifarra_1.webp", "butifarra_pila": "img/butifarra_pila.webp", "carne_1": "img/carne_1.webp", "carne_pila": "img/carne_pila.webp", "cebolla_1": "img/cebolla_1.webp", "cebolla_pila": "img/cebolla_pila.webp", "champinones_1": "img/champinones_1.webp", "champinones_pila": "img/champinones_pila.webp", "chorizo_1": "img/chorizo_1.webp", "chorizo_pila": "img/chorizo_pila.webp", "jamon_1": "img/jamon_1.webp", "jamon_pila": "img/jamon_pila.webp", "maiz_1": "img/maiz_1.webp", "maiz_pila": "img/maiz_pila.webp", "miel_pila": "img/miel_pila.webp", "parmesano_pila": "img/parmesano_pila.webp", "pepperoni_1": "img/pepperoni_1.webp", "pepperoni_pila": "img/pepperoni_pila.webp", "picante_pila": "img/picante_pila.webp", "pimenton_1": "img/pimenton_1.webp", "pimenton_pila": "img/pimenton_pila.webp", "pina_1": "img/pina_1.webp", "pina_pila": "img/pina_pila.webp", "pollo_1": "img/pollo_1.webp", "pollo_pila": "img/pollo_pila.webp", "porchetta_1": "img/porchetta_1.webp", "porchetta_pila": "img/porchetta_pila.webp", "quesoextra_pila": "img/quesoextra_pila.webp", "ranchera_1": "img/ranchera_1.webp", "ranchera_pila": "img/ranchera_pila.webp", "rugula_1": "img/rugula_1.webp", "rugula_pila": "img/rugula_pila.webp", "salami_1": "img/salami_1.webp", "salami_pila": "img/salami_pila.webp", "serrano_1": "img/serrano_1.webp", "serrano_pila": "img/serrano_pila.webp", "tocineta_1": "img/tocineta_1.webp", "tocineta_pila": "img/tocineta_pila.webp", "tomate_1": "img/tomate_1.webp", "tomate_pila": "img/tomate_pila.webp", "uvas_1": "img/uvas_1.webp", "uvas_pila": "img/uvas_pila.webp"};
-for (const id of Object.keys(PHOTOS).filter(k => k.endsWith('_1')).map(k => k.slice(0, -2))) {
-  const src = PHOTOS[id + '_1']; ART[id] = () => `<img class="ph" src="${src}" alt="" draggable="false">`;
-}
 Object.assign(ART, {
   butifarra: () => S(`<circle r="14" fill="#d8a596"/><circle r="14" fill="none" stroke="#9c5d4c" stroke-width="2"/><circle cx="-5" cy="-4" r="1.8" fill="#fff3ea"/><circle cx="4" cy="5" r="1.6" fill="#fff3ea"/><circle cx="5" cy="-6" r="1" fill="#4a2a20"/><circle cx="-6" cy="5" r="1" fill="#4a2a20"/><circle cx="1" cy="0" r=".9" fill="#4a2a20"/>${HL(-4,-6,4.5,1.8)}`),
   porchetta: () => S(`<circle r="17" fill="#e8b0a2"/><circle r="16" fill="none" stroke="#7a3e1a" stroke-width="3.5"/><path d="M0 0 m-2 0 a2 2 0 1 1 4 0 a5 5 0 1 1 -9 1 a8 8 0 1 1 15 -2" fill="none" stroke="#fbeee6" stroke-width="2.2" stroke-linecap="round"/>${HL(-6,-8,6,2.2)}`),
@@ -1005,6 +1002,11 @@ Object.assign(ART, {
   miel: () => S(`<path d="M0 -15 C8 -3 11 3 11 7 A11 11 0 0 1 -11 7 C-11 3 -8 -3 0 -15Z" fill="#e7a21f"/><ellipse cx="-4" cy="4" rx="2.5" ry="4" fill="#fff" opacity=".4"/>`),
   balsamico: () => S(`<path d="M0 -15 C8 -3 11 3 11 7 A11 11 0 0 1 -11 7 C-11 3 -8 -3 0 -15Z" fill="#3b1d12"/><ellipse cx="-4" cy="4" rx="2.5" ry="4" fill="#fff" opacity=".3"/>`)
 });
+/* La foto va de última para que ningún dibujo la reemplace */
+for (const id of Object.keys(PHOTOS).filter(k => k.endsWith('_1')).map(k => k.slice(0, -2))) {
+  const src = PHOTOS[id + '_1']; ART[id] = () => `<img class="ph" src="${src}" alt="" draggable="false">`;
+}
+
 /* ---------- Íconos de la interfaz (trazo, mismo grosor en toda la app) ---------- */
 const ICONS = {
   undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
