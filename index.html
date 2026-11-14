@@ -242,6 +242,17 @@ main{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:18p
 .boxPizza{position:absolute;inset:6%;transform-style:preserve-3d;transform:translateZ(320px);opacity:0;transition:transform .9s cubic-bezier(.3,1.25,.5,1),opacity .3s}
 .boxPizza.in{transform:translateZ(1px);opacity:1}
 .pzClone{position:absolute;inset:0;transform-style:preserve-3d}
+/* Corte al finalizar el pedido */
+.box3d{position:relative}
+.boxPizza .cuts line{stroke:rgba(55,25,5,.8);stroke-width:1.05}
+.cutter{position:absolute;left:50%;top:50%;width:46%;aspect-ratio:3/1;pointer-events:none;opacity:0;filter:drop-shadow(0 6px 5px rgba(0,0,0,.45));transform-origin:0 0}
+.cutter svg{width:100%;height:100%;display:block;overflow:visible}
+.cutter .wheel{transform-box:fill-box;transform-origin:center;animation:wheelSpin .35s linear infinite}
+@keyframes wheelSpin{to{transform:rotate(360deg)}}
+.cutCap{position:absolute;top:2%;left:50%;transform:translate(-50%,-8px);z-index:5;white-space:nowrap;padding:8px 16px;border-radius:999px;background:rgba(18,12,8,.82);border:1px solid rgba(255,214,0,.55);color:#fff;font-weight:800;font-size:14px;letter-spacing:.02em;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none}
+.cutCap.show{opacity:1;transform:translate(-50%,0)}
+.cutCap b{color:#ffd600}
+@media (max-width:700px){.cutCap{font-size:12.5px;padding:7px 13px}}
 .tartara{position:absolute;right:2.5%;bottom:2.5%;width:13%;height:13%;border-radius:50%;transform:translateZ(260px);opacity:0;transition:transform .7s cubic-bezier(.3,1.4,.5,1) .5s,opacity .3s .5s;background:radial-gradient(circle at 40% 35%,#fffbea,#efe6c4 60%,#d7cc9f);box-shadow:0 0 0 3px #f4f4f4,0 6px 8px rgba(0,0,0,.35)}
 .tartara.in{transform:translateZ(2px);opacity:1}
 .lid{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 0;transform:translateZ(var(--h)) rotateX(104deg);transition:transform 1.1s cubic-bezier(.55,0,.25,1)}
@@ -880,6 +891,7 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
 <div class="scene" id="scene">
   <div class="sceneTop"><div class="logo">Italia</div><button class="backTop" id="backTop" aria-label="Volver a armar"><i data-i="chevL"></i>Volver</button></div>
   <div class="box3d" id="box3d">
+    <div class="cutCap" id="cutCap" aria-live="polite"></div>
     <div class="rig">
       <div class="cast2"></div>
       <div class="bxBottom"></div>
@@ -1553,7 +1565,7 @@ function openDrawer(){ renderOrder(); $('#drawer').classList.add('open'); $('#di
 function closeDrawer(){ $('#drawer').classList.remove('open'); $('#dimmer').classList.remove('show'); }
 $('#cartBtn').onclick = () => { sfx.whoosh(); openDrawer(); }; $('#closeDrawer').onclick = closeDrawer; $('#dimmer').onclick = closeDrawer;
 $('#keepBuilding').onclick = () => { closeDrawer(); if (st.baked) newPizza(); };
-$('#checkout').onclick = () => { closeDrawer(); openScene(false); };
+$('#checkout').onclick = () => { closeDrawer(); checkoutScene(); };
 // deslizar hacia abajo para cerrar el panel en el celular
 (() => { let y0=null; const d=$('#drawer');
   d.addEventListener('touchstart', e=>{ if (e.target.closest('.dlist') && $('#dlist').scrollTop>0) return; y0=e.touches[0].clientY; }, {passive:true});
@@ -1634,6 +1646,8 @@ function openScene(animated) {
     clone.querySelectorAll('[id]').forEach(e=>e.removeAttribute('id'));
     clone.querySelectorAll('.glow,.ring').forEach(e=>e.remove());
     bp.appendChild(clone);
+    const it = st.cart[st.last];   // foto de la pizza para repetir el corte al finalizar (no se guarda en el teléfono)
+    if (it) Object.defineProperty(it, '_snap', {value: clone.outerHTML, writable:true, configurable:true, enumerable:false});
     box.classList.remove('instant','lidClosed'); bp.classList.remove('in'); tart.classList.remove('in'); lid.classList.remove('closed'); card.classList.remove('show');
     scene.classList.add('show'); scene.scrollTop = 0;
     setTimeout(()=>{ bp.classList.add('in'); }, 200); setTimeout(()=>sfx.thud(), 750);
@@ -1647,7 +1661,50 @@ function openScene(animated) {
     requestAnimationFrame(()=>requestAnimationFrame(()=>box.classList.remove('instant')));
   }
 }
-function closeScene(){ $('#scene').classList.remove('show'); if (st.baked) newPizza(true); }
+function closeScene(){ clearTimeout(checkoutScene.h); (checkoutScene.t||[]).forEach(clearTimeout); $('#cutCap').classList.remove('show'); $('#scene').classList.remove('show'); if (st.baked) newPizza(true); }
+
+/* "Finalizar pedido": la pizza vuelve a la caja abierta, se corta en 6 porciones y se cierra */
+const CUTTER_SVG = `<svg viewBox="0 0 150 50"><defs>
+  <linearGradient id="cuH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6343a"/><stop offset="1" stop-color="#8f1015"/></linearGradient>
+  <radialGradient id="cuB" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#c9cfd6"/><stop offset="1" stop-color="#7d868f"/></radialGradient></defs>
+  <rect x="2" y="17" width="72" height="16" rx="8" fill="url(#cuH)"/><rect x="10" y="20" width="50" height="3" rx="1.5" fill="rgba(255,255,255,.35)"/>
+  <rect x="70" y="21" width="44" height="8" rx="3" fill="#aeb5bc"/>
+  <g class="wheel"><circle cx="122" cy="25" r="22" fill="url(#cuB)" stroke="#5d656d" stroke-width="1.5"/>
+  <circle cx="122" cy="25" r="5" fill="#5d656d"/><path d="M122 5v8M122 37v8M102 25h8M134 25h8" stroke="#8a929a" stroke-width="2"/></g></svg>`;
+function checkoutScene() {
+  const it = [...st.cart].reverse().find(x => x._snap);
+  if (!it) { openScene(false); return; }
+  const scene=$('#scene'), bp=$('#boxPizza'), lid=$('#lid'), card=$('#card'), box=$('#box3d'), tart=$('#tartara'), cap=$('#cutCap');
+  (checkoutScene.t||[]).forEach(clearTimeout); const T = checkoutScene.t = []; const at = (ms, f) => T.push(setTimeout(f, ms));
+  renderOrder(); refresh();
+  bp.innerHTML = it._snap; const pz = bp.firstElementChild; pz.classList.remove('cut');
+  const lines = [...pz.querySelectorAll('.cuts line')];
+  lines.forEach(l => { l.style.transition = 'none'; l.style.strokeDashoffset = '100'; });
+  const knife = document.createElement('div'); knife.className = 'cutter'; knife.innerHTML = CUTTER_SVG; bp.appendChild(knife);
+  box.classList.add('instant'); box.classList.remove('lidClosed'); lid.classList.remove('closed'); tart.classList.remove('in'); bp.classList.add('in'); card.classList.remove('show');
+  scene.classList.add('show'); scene.scrollTop = 0;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>box.classList.remove('instant')));
+  const n = cartCount();
+  cap.innerHTML = n > 1 ? `Cortando tus <b>${n} pizzas</b> en 6 porciones…` : 'Cortando en <b>6 porciones</b>…';
+  at(250, () => cap.classList.add('show'));
+  const ANG = [0, 60, 120], STEP = 640, DUR = 480;
+  ANG.forEach((a, i) => at(500 + i*STEP, () => {
+    const R = bp.clientWidth * .5, base = `translateZ(16px) rotate(${a}deg)`, kw = knife.offsetWidth, kh = knife.offsetHeight;
+    // la rueda (extremo derecho del cortador) recorre el diámetro de un borde al otro
+    const pos = x => `${base} translate(${x - kw*.81}px, ${-kh/2}px)`;
+    knife.animate([{transform:pos(-R), opacity:0},{transform:pos(-R*.8), opacity:1, offset:.12},{transform:pos(R*.8), opacity:1, offset:.88},{transform:pos(R), opacity:0}], {duration:DUR, easing:'cubic-bezier(.45,0,.4,1)', fill:'forwards'});
+    const l = lines[i]; if (l) { l.style.transition = `stroke-dashoffset ${DUR}ms cubic-bezier(.45,0,.4,1)`; l.style.strokeDashoffset = '0'; }
+    sfx.cutter(0); vibrate(8);
+  }));
+  const done = 500 + ANG.length*STEP;
+  at(done, () => { knife.remove(); pz.animate([{transform:'scale(1)'},{transform:'scale(1.035)'},{transform:'scale(1)'}], {duration:380, easing:'ease-out'}); sfx.ding(); cap.innerHTML = '¡Lista! <b>6 porciones</b> por pizza'; });
+  at(done + 250, () => tart.classList.add('in')); at(done + 850, () => sfx.tick());
+  at(done + 1100, () => { lid.classList.add('closed'); box.classList.add('lidClosed'); });
+  at(done + 1500, () => cap.classList.remove('show'));
+  at(done + 2100, () => { sfx.thud(); sfx.success(); vibrate(30); });
+  at(700, () => card.classList.add('show'));
+  track('finalizar_pedido', resumenPedido());
+}
 
 /* ================= WhatsApp ================= */
 function orderText() {
