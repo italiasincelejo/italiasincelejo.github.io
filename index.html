@@ -2473,20 +2473,87 @@ async function sharePizza(origen) {
     for (const src of new Set([...svg.matchAll(/href="(img\/[^"]+)"/g)].map(m => m[1]))) svg = svg.split(`href="${src}"`).join(`href="${await asData(src)}"`);
     const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     await img.decode();
-    const W = 1080, H = 1350, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
-    ctx.fillStyle = '#0d0b0a'; ctx.fillRect(0,0,W,H);
-    let g = ctx.createRadialGradient(W/2, 560, 80, W/2, 560, 640); g.addColorStop(0,'rgba(227,18,27,.32)'); g.addColorStop(1,'rgba(227,18,27,0)'); ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+    /* Historia 1080×1920: lo importante queda entre y=250 y y=1700 (zonas libres de la interfaz de Instagram) */
+    const W = 1080, H = 1920, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
+    const loadImg = src => new Promise(res => { if (!src) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+    const [niko, qr] = await Promise.all([loadImg(NIKO_IMG), loadImg(await asData('assets/qr-italiasincelejo.png'))]);
+    const CX = W/2, CY = 792, PR = 340;
+    const rr = (x, y, w, h, r) => { ctx.beginPath(); ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath(); };
+    // fondo: negro cálido, foco rojo detrás de la pizza y brasa naranja por debajo
+    ctx.fillStyle = '#0a0807'; ctx.fillRect(0, 0, W, H);
+    let g = ctx.createRadialGradient(CX, CY, 60, CX, CY, 900); g.addColorStop(0, 'rgba(227,18,27,.42)'); g.addColorStop(.55, 'rgba(227,18,27,.10)'); g.addColorStop(1, 'rgba(227,18,27,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    g = ctx.createRadialGradient(CX, CY + PR + 40, 20, CX, CY + PR + 40, 520); g.addColorStop(0, 'rgba(255,140,40,.38)'); g.addColorStop(1, 'rgba(255,90,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // rayos de luz muy suaves detrás de la pizza
+    ctx.save(); ctx.translate(CX, CY); ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 18; i++) { ctx.rotate(Math.PI*2/18); const rg = ctx.createLinearGradient(0, 0, 0, -1000); rg.addColorStop(0, 'rgba(255,60,60,.07)'); rg.addColorStop(1, 'rgba(255,60,60,0)');
+      ctx.fillStyle = rg; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-38, -1000); ctx.lineTo(38, -1000); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+    // viñeta
+    g = ctx.createRadialGradient(CX, H/2, H*.35, CX, H/2, H*.75); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.65)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // logo en neón
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.save(); ctx.translate(CX, 332); ctx.rotate(-4*Math.PI/180); ctx.font = '124px "Kaushan Script", cursive';
+    ctx.shadowColor = 'rgba(255,30,45,.95)'; ctx.shadowBlur = 60; ctx.fillStyle = '#ff2a3a'; ctx.fillText('Italia', 0, 0); ctx.shadowBlur = 24; ctx.fillText('Italia', 0, 0);
+    ctx.shadowBlur = 0; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.strokeText('Italia', 0, 0); ctx.fillStyle = '#ff3646'; ctx.fillText('Italia', 0, 0);
+    ctx.restore();
+    ctx.fillStyle = 'rgba(255,255,255,.62)'; ctx.font = '700 24px Inter, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '14px'; ctx.fillText('SINCELEJO', CX + 7, 380); if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+    // tabla de madera y pizza
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.75)'; ctx.shadowBlur = 70; ctx.shadowOffsetY = 36;
+    g = ctx.createRadialGradient(CX - 120, CY - 140, 60, CX, CY, PR + 50); g.addColorStop(0, '#8a5328'); g.addColorStop(.85, '#5c3416'); g.addColorStop(1, '#3d220e');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(CX, CY, PR + 46, 0, Math.PI*2); ctx.fill(); ctx.restore();
+    ctx.strokeStyle = 'rgba(255,200,140,.12)'; ctx.lineWidth = 2; for (let k = 1; k < 4; k++) { ctx.beginPath(); ctx.arc(CX, CY, PR + 46 - k*11, 0, Math.PI*2); ctx.stroke(); }
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.55)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 12; ctx.drawImage(img, CX - PR, CY - PR, PR*2, PR*2); ctx.restore();
+    // cortes: 6 porciones
+    ctx.save(); ctx.strokeStyle = 'rgba(60,28,6,.55)'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    for (const a of [0, 60, 120]) { const r = a*Math.PI/180, d = PR*.94; ctx.beginPath(); ctx.moveTo(CX - Math.cos(r)*d, CY - Math.sin(r)*d); ctx.lineTo(CX + Math.cos(r)*d, CY + Math.sin(r)*d); ctx.stroke(); }
+    ctx.restore();
+    // brillo de luz sobre la pizza
+    g = ctx.createRadialGradient(CX - 150, CY - 170, 10, CX - 150, CY - 170, 420); g.addColorStop(0, 'rgba(255,248,230,.20)'); g.addColorStop(1, 'rgba(255,248,230,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(CX, CY, PR, 0, Math.PI*2); ctx.fill();
+    // sello "Hecha por mí"
+    ctx.save(); ctx.translate(CX + PR + 10, CY - PR + 50); ctx.rotate(-14*Math.PI/180);
+    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10; ctx.fillStyle = '#e3121b'; ctx.beginPath(); ctx.arc(0, 0, 108, 0, Math.PI*2); ctx.fill(); ctx.shadowColor = 'transparent';
+    ctx.setLineDash([7, 7]); ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 90, 0, Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#fff'; ctx.font = '900 40px Inter, sans-serif'; ctx.fillText(it.house ? 'DE LA' : 'HECHA', 0, -6); ctx.fillText(it.house ? 'CASA' : 'POR MÍ', 0, 38);
+    ctx.fillStyle = '#ffd600'; ctx.font = '800 20px Inter, sans-serif'; ctx.fillText('★ 27 CM ★', 0, -48);
+    ctx.restore();
+    // título
+    const nombre = ($('#fName') && $('#fName').value.trim().split(/\s+/)[0]) || '';
+    const name = it.house && CASA[it.house] ? CASA[it.house].name : (nombre ? `La pizza de ${nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase()}` : 'Mi pizza a mi manera');
+    ctx.fillStyle = '#ff3b47'; ctx.font = '800 24px Inter, sans-serif'; if ('letterSpacing' in ctx) ctx.letterSpacing = '8px'; ctx.fillText(it.house ? 'MI ELEGIDA DE LA CASA' : 'LA ARMÉ A MI MANERA', CX + 4, 1236); if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+    ctx.fillStyle = '#fff'; let fs = 78; ctx.font = `600 ${fs}px Fraunces, Georgia, serif`; while (ctx.measureText(name).width > 940 && fs > 48) { fs -= 4; ctx.font = `600 ${fs}px Fraunces, Georgia, serif`; }
+    ctx.fillText(name, CX, 1314);
+    // ingredientes en chips
+    const ings = Object.keys(it.tops).map(id => TOPS[id].name + (it.tops[id] > 1 ? ' ×2' : ''));
+    const list = ings.length ? ings : ['Tomate', 'Mozzarella', 'Finas hierbas'];
+    ctx.font = '600 28px Inter, sans-serif';
+    const rows = [[]]; let rw = 0; const pad = 22, gap = 12, maxW = 940;
+    for (const s of list) { const w = ctx.measureText(s).width + pad*2; if (rw + w > maxW && rows[rows.length-1].length) { if (rows.length === 2) break; rows.push([]); rw = 0; } rows[rows.length-1].push([s, w]); rw += w + gap; }
+    const shown = rows.flat().length; if (shown < list.length) { const last = rows[rows.length-1]; const s = `+${list.length - shown} más`; last.push([s, ctx.measureText(s).width + pad*2]); }
+    rows.forEach((row, ri) => {
+      const tw = row.reduce((a, [, w]) => a + w, 0) + gap*(row.length-1); let x = CX - tw/2; const y = 1346 + ri*60;
+      for (const [s, w] of row) { rr(x, y, w, 50, 25); ctx.fillStyle = 'rgba(255,255,255,.08)'; ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = '#ececf0'; ctx.fillText(s, x + w/2, y + 35); x += w + gap; }
+    });
+    // precio
+    const py = 1346 + rows.length*60 + 10, ptxt = fmt(unitOf(it.tops, it.house));
+    ctx.font = '900 40px Inter, sans-serif'; const pw = ctx.measureText(ptxt).width + 64;
+    ctx.save(); ctx.shadowColor = 'rgba(255,214,0,.45)'; ctx.shadowBlur = 28; rr(CX - pw/2, py, pw, 66, 33); ctx.fillStyle = '#ffd600'; ctx.fill(); ctx.restore();
+    ctx.fillStyle = '#111'; ctx.fillText(ptxt, CX, py + 47);
+    // invitación con Niko, enlace y QR
+    const cy0 = py + 86, cw = 940, ch = 130, cx0 = CX - cw/2;
+    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 14; rr(cx0, cy0, cw, ch, 34); ctx.fillStyle = '#fff'; ctx.fill(); ctx.restore();
+    if (niko) { ctx.save(); ctx.beginPath(); ctx.arc(cx0 + 78, cy0 + ch/2, 52, 0, Math.PI*2); ctx.clip(); ctx.drawImage(niko, cx0 + 26, cy0 + ch/2 - 52, 104, 104); ctx.restore();
+      ctx.strokeStyle = '#e3121b'; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(cx0 + 78, cy0 + ch/2, 54, 0, Math.PI*2); ctx.stroke(); }
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#111'; ctx.font = '800 38px Inter, sans-serif'; ctx.fillText('¿Y la tuya? Ármala aquí', cx0 + 156, cy0 + 58);
+    ctx.fillStyle = '#e3121b'; ctx.font = '700 30px Inter, sans-serif'; ctx.fillText('italiasincelejo.github.io', cx0 + 156, cy0 + 96);
+    if (qr) { ctx.drawImage(qr, cx0 + cw - 118, cy0 + 11, 108, 108); }
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#e3121b'; ctx.font = '110px "Kaushan Script", cursive'; ctx.fillText('Italia', W/2, 150);
-    ctx.fillStyle = '#bdbdc4'; ctx.font = '600 28px Inter, sans-serif'; ctx.fillText('ARMÉ MI PIZZA EN ITALIA SINCELEJO', W/2, 205);
-    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.6)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 24; ctx.drawImage(img, (W-720)/2, 245, 720, 720); ctx.restore();
-    const name = it.house && CASA[it.house] ? CASA[it.house].name : 'Mi pizza a mi manera';
-    ctx.fillStyle = '#fff'; ctx.font = '600 62px Fraunces, Georgia, serif'; ctx.fillText(name, W/2, 1060);
-    const ings = Object.keys(it.tops).map(id => TOPS[id].name + (it.tops[id] > 1 ? ' doble' : ''));
-    ctx.fillStyle = '#d6d6dc'; ctx.font = '500 32px Inter, sans-serif';
-    wrapText(ctx, ings.length ? ings.join(' · ') : 'Tomate, mozzarella y finas hierbas', 900).slice(0,2).forEach((l,i) => ctx.fillText(l, W/2, 1118 + i*44));
-    ctx.fillStyle = '#ff4d55'; ctx.font = '800 40px Inter, sans-serif'; ctx.fillText(fmt(unitOf(it.tops, it.house)), W/2, 1222);
-    ctx.fillStyle = '#9a9aa3'; ctx.font = '500 26px Inter, sans-serif'; ctx.fillText('Arma la tuya · @italiasincelejo', W/2, 1290);
+    // grano fino de película para que no se vea plano
+    const nz = document.createElement('canvas'); nz.width = nz.height = 160; const nc = nz.getContext('2d'), id = nc.createImageData(160, 160);
+    for (let i = 0; i < id.data.length; i += 4) { const v = Math.random()*255; id.data[i] = id.data[i+1] = id.data[i+2] = v; id.data[i+3] = 14; }
+    nc.putImageData(id, 0, 0); ctx.fillStyle = ctx.createPattern(nz, 'repeat'); ctx.fillRect(0, 0, W, H);
     const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
     const file = new File([blob], 'mi-pizza-italia.png', {type:'image/png'});
     const url = location.origin + location.pathname;
