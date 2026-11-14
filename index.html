@@ -244,7 +244,7 @@ main{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:18p
 .pzClone{position:absolute;inset:0;transform-style:preserve-3d}
 /* Corte al finalizar el pedido */
 .box3d{position:relative}
-.boxPizza .cuts line{stroke:rgba(55,25,5,.8);stroke-width:1.05}
+#pizza .cuts line,.boxPizza .cuts line{stroke:rgba(55,25,5,.8);stroke-width:1.05}
 .cutter{position:absolute;left:50%;top:50%;width:46%;aspect-ratio:3/1;pointer-events:none;opacity:0;filter:drop-shadow(0 6px 5px rgba(0,0,0,.45));transform-origin:0 0}
 .cutter svg{width:100%;height:100%;display:block;overflow:visible}
 .cutter .wheel{transform-box:fill-box;transform-origin:center;animation:wheelSpin .35s linear infinite}
@@ -1625,8 +1625,9 @@ function oven() {
       s.style.left=(30+Math.random()*40)+'%'; s.style.top=(15+Math.random()*30)+'%'; s.style.animationDelay=(i*.18)+'s';
       $('#stage3d').appendChild(s); setTimeout(()=>s.remove(),3400); }
     txt.textContent='Cortando en 6 porciones…';
-    pizza.classList.add('cut'); [0,1,2].forEach(i => sfx.cutter(i*.38));
-    setTimeout(()=>{ txt.textContent='¡Lista!'; sfx.ding(); vibrate(20); }, 1250);
+    const lines = [...pizza.querySelectorAll('.cuts line')];
+    knifeCut(pizza, lines, () => { pizza.classList.add('cut'); lines.forEach(l => { l.style.transition = ''; l.style.strokeDashoffset = ''; }); });
+    setTimeout(()=>{ txt.textContent='¡Lista!'; sfx.ding(); vibrate(20); }, CUT.ANG.length*CUT.STEP + 80);
   }, 2700);
   setTimeout(()=>{
     banner.classList.remove('show');
@@ -1636,7 +1637,7 @@ function oven() {
     else { st.cart.push({tops, qty:1, house: st.house}); st.last = st.cart.length-1; }
     st.editing = null;
     openScene(true);
-  }, 4700);
+  }, 5100);
 }
 function openScene(animated) {
   const scene=$('#scene'), bp=$('#boxPizza'), lid=$('#lid'), card=$('#card'), box=$('#box3d'), tart=$('#tartara');
@@ -1671,6 +1672,22 @@ const CUTTER_SVG = `<svg viewBox="0 0 150 50"><defs>
   <rect x="70" y="21" width="44" height="8" rx="3" fill="#aeb5bc"/>
   <g class="wheel"><circle cx="122" cy="25" r="22" fill="url(#cuB)" stroke="#5d656d" stroke-width="1.5"/>
   <circle cx="122" cy="25" r="5" fill="#5d656d"/><path d="M122 5v8M122 37v8M102 25h8M134 25h8" stroke="#8a929a" stroke-width="2"/></g></svg>`;
+/* Cortador que atraviesa la pizza 3 veces (6 porciones). host: donde se mueve; lines: las 3 líneas de corte */
+const CUT = {ANG:[0,60,120], STEP:640, DUR:480};
+function knifeCut(host, lines, after) {
+  const knife = document.createElement('div'); knife.className = 'cutter'; knife.innerHTML = CUTTER_SVG; host.appendChild(knife);
+  lines.forEach(l => { l.style.transition = 'none'; l.style.strokeDashoffset = '100'; });
+  const T = [];
+  CUT.ANG.forEach((a, i) => T.push(setTimeout(() => {
+    const R = host.clientWidth * .5, base = `translateZ(16px) rotate(${a}deg)`, kw = knife.offsetWidth, kh = knife.offsetHeight;
+    const pos = x => `${base} translate(${x - kw*.81}px, ${-kh/2}px)`;   // la rueda recorre el diámetro de borde a borde
+    knife.animate([{transform:pos(-R), opacity:0},{transform:pos(-R*.8), opacity:1, offset:.12},{transform:pos(R*.8), opacity:1, offset:.88},{transform:pos(R), opacity:0}], {duration:CUT.DUR, easing:'cubic-bezier(.45,0,.4,1)', fill:'forwards'});
+    const l = lines[i]; if (l) { l.style.transition = `stroke-dashoffset ${CUT.DUR}ms cubic-bezier(.45,0,.4,1)`; l.style.strokeDashoffset = '0'; }
+    sfx.cutter(0); vibrate(8);
+  }, i*CUT.STEP)));
+  T.push(setTimeout(() => { knife.remove(); if (after) after(); }, CUT.ANG.length*CUT.STEP));
+  return T;
+}
 function checkoutScene() {
   const it = [...st.cart].reverse().find(x => x._snap);
   if (!it) { openScene(false); return; }
@@ -1680,24 +1697,15 @@ function checkoutScene() {
   bp.innerHTML = it._snap; const pz = bp.firstElementChild; pz.classList.remove('cut');
   const lines = [...pz.querySelectorAll('.cuts line')];
   lines.forEach(l => { l.style.transition = 'none'; l.style.strokeDashoffset = '100'; });
-  const knife = document.createElement('div'); knife.className = 'cutter'; knife.innerHTML = CUTTER_SVG; bp.appendChild(knife);
   box.classList.add('instant'); box.classList.remove('lidClosed'); lid.classList.remove('closed'); tart.classList.remove('in'); bp.classList.add('in'); card.classList.remove('show');
   scene.classList.add('show'); scene.scrollTop = 0;
   requestAnimationFrame(()=>requestAnimationFrame(()=>box.classList.remove('instant')));
   const n = cartCount();
   cap.innerHTML = n > 1 ? `Cortando tus <b>${n} pizzas</b> en 6 porciones…` : 'Cortando en <b>6 porciones</b>…';
   at(250, () => cap.classList.add('show'));
-  const ANG = [0, 60, 120], STEP = 640, DUR = 480;
-  ANG.forEach((a, i) => at(500 + i*STEP, () => {
-    const R = bp.clientWidth * .5, base = `translateZ(16px) rotate(${a}deg)`, kw = knife.offsetWidth, kh = knife.offsetHeight;
-    // la rueda (extremo derecho del cortador) recorre el diámetro de un borde al otro
-    const pos = x => `${base} translate(${x - kw*.81}px, ${-kh/2}px)`;
-    knife.animate([{transform:pos(-R), opacity:0},{transform:pos(-R*.8), opacity:1, offset:.12},{transform:pos(R*.8), opacity:1, offset:.88},{transform:pos(R), opacity:0}], {duration:DUR, easing:'cubic-bezier(.45,0,.4,1)', fill:'forwards'});
-    const l = lines[i]; if (l) { l.style.transition = `stroke-dashoffset ${DUR}ms cubic-bezier(.45,0,.4,1)`; l.style.strokeDashoffset = '0'; }
-    sfx.cutter(0); vibrate(8);
-  }));
-  const done = 500 + ANG.length*STEP;
-  at(done, () => { knife.remove(); pz.animate([{transform:'scale(1)'},{transform:'scale(1.035)'},{transform:'scale(1)'}], {duration:380, easing:'ease-out'}); sfx.ding(); cap.innerHTML = '¡Lista! <b>6 porciones</b> por pizza'; });
+  at(500, () => T.push(...knifeCut(bp, lines)));
+  const done = 500 + CUT.ANG.length*CUT.STEP;
+  at(done, () => { pz.animate([{transform:'scale(1)'},{transform:'scale(1.035)'},{transform:'scale(1)'}], {duration:380, easing:'ease-out'}); sfx.ding(); cap.innerHTML = '¡Lista! <b>6 porciones</b> por pizza'; });
   at(done + 250, () => tart.classList.add('in')); at(done + 850, () => sfx.tick());
   at(done + 1100, () => { lid.classList.add('closed'); box.classList.add('lidClosed'); });
   at(done + 1500, () => cap.classList.remove('show'));
