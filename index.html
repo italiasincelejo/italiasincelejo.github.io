@@ -276,6 +276,7 @@ main{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:18p
 @keyframes flameSweep{0%{transform:translateY(55%) scaleY(.4);opacity:0}15%{opacity:1}55%{transform:translateY(-6%) scaleY(1.05);opacity:1}100%{transform:translateY(-40%) scaleY(.7);opacity:0}}
 /* Corte al finalizar el pedido */
 .fireGL{position:absolute;left:-4%;right:-4%;bottom:0;height:100%;width:108%;z-index:6;pointer-events:none}
+.fireGL.under{z-index:0}
 .box3d{position:relative}
 #pizza .cuts line,.boxPizza .cuts line{stroke:rgba(55,25,5,.8);stroke-width:1.05}
 .cutter{position:absolute;left:50%;top:50%;width:46%;aspect-ratio:3/1;pointer-events:none;opacity:0;filter:drop-shadow(0 6px 5px rgba(0,0,0,.45));transform-origin:0 0}
@@ -1664,7 +1665,7 @@ function oven() {
   txt.textContent='Horneando…'; prog.style.transition='none'; prog.style.width='0';
   banner.classList.add('show'); void prog.offsetWidth;
   prog.style.transition='width 2.6s linear'; prog.style.width='100%';
-  sfx.oven(); flameBurst($('#stage3d'), 2500);
+  sfx.oven(); flameBurst($('#stage3d'), 2600, pizza, $('#tilt'));
   setTimeout(()=>pizza.classList.add('baked'), 300);
   setTimeout(()=>{ txt.textContent='Gratinando el queso…'; }, 1500);
   setTimeout(()=>{
@@ -1724,7 +1725,7 @@ const CUTTER_SVG = `<svg viewBox="0 0 150 50"><defs>
 /* Llamarada realista de abajo hacia arriba: fuego generado en la tarjeta gráfica (ruido fractal),
    que sube por la pizza y se apaga. Si el teléfono no tiene WebGL, usa las llamas sencillas. */
 const FIRE_FS = `precision mediump float;
-uniform vec2 r; uniform float t; uniform float p;
+uniform vec2 r; uniform float t; uniform float p; uniform float m; uniform vec4 el;
 float h(vec2 q){return fract(sin(dot(q,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 q){vec2 i=floor(q),f=fract(q);vec2 u=f*f*(3.-2.*f);
   return mix(mix(h(i),h(i+vec2(1.,0.)),u.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),u.x),u.y);}
@@ -1735,24 +1736,37 @@ void main(){
   vec2 q=vec2(uv.x*5.,uv.y*2.6-sp);
   float w=fbm(q*1.1+vec2(3.1,-sp*.3));
   float k=fbm(q+vec2(w*1.4-.7,w*.8));
-  float front=mix(.15,1.15,smoothstep(0.,.45,p));
-  float base=smoothstep(.65,1.,p)*.3;
-  float hx=front*(.55+.65*fbm(vec2(uv.x*3.2+7.,t*1.3)));
-  float y=max(uv.y-base,0.)/max(hx,.05);
-  float f=k*2.1-.25-y*y*.95-y*.25;
-  f+=(1.-smoothstep(0.,.2,uv.y))*.25;
-  f*=smoothstep(base-.02,base+.1,uv.y)*smoothstep(0.,.05,uv.y);
-  float cx=abs(uv.x-.5)*2.;
-  f*=1.-smoothstep(.6,1.,cx);
-  f*=smoothstep(0.,.08,p)*(1.-smoothstep(.7,1.,p));
+  float env=smoothstep(0.,.08,p)*(1.-smoothstep(.72,1.,p));
+  float f;
+  vec2 d=(uv-el.xy)/el.zw;
+  if(m<.5){
+    /* debajo de la pizza: llamas que salen por los bordes */
+    float front=mix(.1,1.,smoothstep(0.,.4,p));
+    float hx=front*(.55+.65*fbm(vec2(uv.x*3.2+7.,t*1.3)));
+    float y=max(uv.y-(el.y-el.w*.6),0.)/max(hx,.05);
+    f=k*2.3-.15-y*y*.8-y*.2;
+    f*=smoothstep(el.y-el.w*.9,el.y-el.w*.5,uv.y);
+    f*=1.-smoothstep(.75,1.25,abs(d.x));
+  } else {
+    /* a través de la pizza: el frente de fuego la atraviesa de abajo hacia arriba */
+    float sweep=mix(-1.2,1.35,smoothstep(.04,.62,p));
+    float local=d.y-sweep;
+    float hy=.55*(.6+.8*fbm(vec2(uv.x*4.,t*1.2)));
+    float y=max(local,0.)*el.w/max(hy*el.w*1.6,.02);
+    f=k*2.4-.12-y*y*1.0-y*.25;
+    f-=smoothstep(.15,.9,-local)*.75;
+    f*=1.-smoothstep(.8,1.05,length(vec2(d.x,min(d.y,max(sweep,-1.)))));
+    f*=smoothstep(-1.15,-.95,d.y);
+  }
+  f*=env*(1.-smoothstep(.8,1.,uv.y));
   f=clamp(f,0.,1.);
   vec3 c=vec3(1.45*f+.15,.95*f*f,.5*f*f*f*f);
   c=mix(c,vec3(1.,.97,.85),smoothstep(.85,1.,f)*.4);
   float a=smoothstep(.08,.5,f)*.95;
   gl_FragColor=vec4(min(c,1.)*a,a);
 }`;
-function fireGL(host, dur) {
-  const cv = document.createElement('canvas'); cv.className = 'fireGL';
+function fireLayer(host, dur, mode, target, before) {
+  const cv = document.createElement('canvas'); cv.className = 'fireGL' + (mode ? '' : ' under');
   const gl = cv.getContext('webgl', {premultipliedAlpha:true, alpha:true, antialias:false}); if (!gl) return false;
   const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; };
   const vs = sh(gl.VERTEX_SHADER, 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}'), fs = sh(gl.FRAGMENT_SHADER, FIRE_FS);
@@ -1762,11 +1776,14 @@ function fireGL(host, dur) {
   gl.useProgram(pr);
   gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
   const la = gl.getAttribLocation(pr, 'a'); gl.enableVertexAttribArray(la); gl.vertexAttribPointer(la, 2, gl.FLOAT, false, 0, 0);
-  const uR = gl.getUniformLocation(pr, 'r'), uT = gl.getUniformLocation(pr, 't'), uP = gl.getUniformLocation(pr, 'p');
-  host.appendChild(cv);
+  const U = k => gl.getUniformLocation(pr, k);
+  if (before) host.insertBefore(cv, before); else host.appendChild(cv);
   const sc = LITE ? .55 : .8, W = Math.max(2, Math.round(cv.clientWidth*sc)), H = Math.max(2, Math.round(cv.clientHeight*sc));
-  cv.width = W; cv.height = H; gl.viewport(0, 0, W, H); gl.uniform2f(uR, W, H);
-  const t0 = performance.now(), seed = Math.random()*50;
+  cv.width = W; cv.height = H; gl.viewport(0, 0, W, H); gl.uniform2f(U('r'), W, H); gl.uniform1f(U('m'), mode);
+  // la pizza en coordenadas del lienzo (0 a 1, con y hacia arriba)
+  const c = cv.getBoundingClientRect(), z = target.getBoundingClientRect();
+  gl.uniform4f(U('el'), (z.left + z.width/2 - c.left)/c.width, 1 - (z.top + z.height/2 - c.top)/c.height, z.width/2/c.width, z.height/2/c.height);
+  const uT = U('t'), uP = U('p'), t0 = performance.now(), seed = Math.random()*50;
   const frame = now => {
     const e = now - t0, p = Math.min(1, e/dur);
     gl.uniform1f(uT, seed + e/1000); gl.uniform1f(uP, p);
@@ -1777,9 +1794,16 @@ function fireGL(host, dur) {
   requestAnimationFrame(frame);
   return true;
 }
-function flameBurst(host, dur=2400) {
+/* dos capas: fuego por debajo de la pizza (sale por los bordes) y un frente que la atraviesa de abajo hacia arriba */
+function fireGL(host, dur, target, under) {
+  if (!target) return false;
+  if (!fireLayer(host, dur, 1, target)) return false;
+  fireLayer(host, dur, 0, target, under);
+  return true;
+}
+function flameBurst(host, dur=2400, target, under) {
   if (!host || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
-  try { if (fireGL(host, dur)) return; } catch(e) {}
+  try { if (fireGL(host, dur, target, under)) return; } catch(e) {}
   const f = document.createElement('div'); f.className = 'flames'; f.style.setProperty('--fd', dur+'ms');
   let s = ''; const N = LITE ? 18 : 26;
   for (let i=0;i<N;i++) { const w = 20 + Math.random()*20, x = (i+.5)/N*100 - w/2 + (Math.random()-.5)*8, row = i%3;
@@ -1818,10 +1842,10 @@ function checkoutScene() {
   const n = cartCount();
   cap.innerHTML = 'Dándole su <b>último toque de horno</b>…';
   at(250, () => cap.classList.add('show'));
-  at(1450, () => { cap.innerHTML = n > 1 ? `Cortando tus <b>${n} pizzas</b> en 6 porciones…` : 'Cortando en <b>6 porciones</b>…'; });
-  at(150, () => { flameBurst(box, 1500); sfx.flame(); });
-  at(1500, () => T.push(...knifeCut(bp, lines)));
-  const done = 1500 + CUT.ANG.length*CUT.STEP;
+  at(1700, () => { cap.innerHTML = n > 1 ? `Cortando tus <b>${n} pizzas</b> en 6 porciones…` : 'Cortando en <b>6 porciones</b>…'; });
+  at(150, () => { flameBurst(box, 1700, bp, box.querySelector('.rig')); sfx.flame(); });
+  at(1750, () => T.push(...knifeCut(bp, lines)));
+  const done = 1750 + CUT.ANG.length*CUT.STEP;
   at(done, () => { pz.animate([{transform:'scale(1)'},{transform:'scale(1.035)'},{transform:'scale(1)'}], {duration:380, easing:'ease-out'}); sfx.ding(); cap.innerHTML = '¡Lista! <b>6 porciones</b> por pizza'; });
   at(done + 250, () => tart.classList.add('in')); at(done + 850, () => sfx.tick());
   at(done + 1100, () => { lid.classList.add('closed'); box.classList.add('lidClosed'); });
