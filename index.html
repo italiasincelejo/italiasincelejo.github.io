@@ -1408,13 +1408,16 @@ function addTopping(id, quick) {
     if (quick) continue;
     const delay=i*55;
     if (LITE) {   // caída en 2D: mismo efecto visual, mucho más liviana para el celular
+      // cae desde arriba con gravedad, rebota un poquito y se asienta (solo transform y opacidad: liviano)
+      const h = 210 + Math.random()*70, sp = (Math.random()-.5)*110;
       p.animate([
-        {transform:`translate(-50%,-50%) rotate(${rot-90}deg) scale(2.1)`,opacity:0},
-        {opacity:1,offset:.35},
-        {transform:`translate(-50%,-50%) rotate(${rot}deg) scale(.9)`,offset:.75},
+        {transform:`translate(-50%,-50%) translateY(${-h}px) rotate(${rot+sp}deg) scale(1.3)`,opacity:0,easing:'cubic-bezier(.55,0,.85,.35)'},
+        {opacity:1,offset:.18},
+        {transform:`translate(-50%,-50%) translateY(0) rotate(${rot}deg) scale(1)`,offset:.66,easing:'cubic-bezier(.2,.7,.4,1)'},
+        {transform:`translate(-50%,-50%) translateY(-7px) rotate(${rot}deg) scale(1.04)`,offset:.82,easing:'cubic-bezier(.5,0,.8,.5)'},
         {transform:`translate(-50%,-50%) rotate(${rot}deg) scale(1)`,opacity:1}
-      ],{duration:520,delay,easing:'cubic-bezier(.3,.8,.4,1)',fill:'backwards'});
-      if (i % 3 === 0) setTimeout(()=>sfx.land(), delay+380);
+      ],{duration:640,delay,fill:'backwards'});
+      if (i % 3 === 0) setTimeout(()=>sfx.land(), delay+420);
       continue;
     }
     p.animate([
@@ -1447,7 +1450,13 @@ function addLayer(id, t, count, quick) {   // quesos que cubren toda la pizza
   }
   p.innerHTML = S(s, '0 0 100 100');
   piecesEl.insertBefore(p, piecesEl.firstChild);   // el queso va debajo de los demás ingredientes
-  if (!quick) p.animate([{clipPath:'circle(0% at 50% 50%)', opacity:.6},{clipPath:'circle(52% at 50% 50%)', opacity:1}], {duration:800, easing:'cubic-bezier(.2,.8,.2,1)'});
+  if (!quick) p.animate([   // el queso cae desde arriba y se esparce sobre la pizza
+    {transform:'translate(-50%,-50%) translateY(-230px) scale(.55)', clipPath:'circle(30% at 50% 50%)', opacity:0, easing:'cubic-bezier(.55,0,.85,.35)'},
+    {opacity:1, offset:.2},
+    {transform:'translate(-50%,-50%) translateY(0) scale(.7)', clipPath:'circle(34% at 50% 50%)', offset:.5, easing:'cubic-bezier(.2,.8,.2,1)'},
+    {transform:'translate(-50%,-50%) scale(1.03)', clipPath:'circle(52% at 50% 50%)', offset:.85},
+    {transform:'translate(-50%,-50%) scale(1)', clipPath:'circle(52% at 50% 50%)', opacity:1}
+  ], {duration:900});
   if (!quick) sfx.sparkle();
   st.history.push({t:'top', id, els:[p]});
 }
@@ -1500,7 +1509,7 @@ function newPizza(withSound) { clearPizza(); st.editing = null; autoBase(withSou
 function loadHouse(cid) {   // pizza de la casa como punto de partida
   const c = CASA[cid]; if (!c) return;
   const editing = st.editing; clearPizza(); st.editing = editing; st.house = cid; autoBase(false);
-  c.tops.forEach((id,k) => { if (LITE) addTopping(id, true); else setTimeout(()=>{ addTopping(id); refresh(); }, k*160); });
+  c.tops.forEach((id,k) => setTimeout(()=>{ addTopping(id); refresh(); }, k*(LITE ? 230 : 160)));
   $('#hint').classList.add('hide'); sfx.select(); vibrate(15); refresh();
   nikoSays(NIKO_DICE.casa.replace('{name}', c.name));
   track('pizza_casa_elegida', {pizza: c.name, precio: c.price});
