@@ -44,6 +44,30 @@ header,main,.bar{min-width:0}
 header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 30px;padding-top:max(14px,env(safe-area-inset-top));border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.1))}
 .brand{display:flex;align-items:center;gap:16px}
 .logo{font-family:"Kaushan Script",cursive;font-size:40px;line-height:1;color:var(--red);text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,4px 5px 0 rgba(0,0,0,.6);transform:rotate(-4deg)}
+
+/* Letrero LED: el logo se enciende con parpadeo y queda brillando */
+.logo.neon{color:#7a0e14;text-shadow:2px 2px 0 rgba(255,255,255,.55),-1px -1px 0 rgba(255,255,255,.55),1px -1px 0 rgba(255,255,255,.55),-1px 1px 0 rgba(255,255,255,.55),4px 5px 0 rgba(0,0,0,.6);transition:none}
+.logo.neon.lit{animation:neonOn 1.7s steps(1,end) forwards,neonHum 9s ease-in-out 1.7s infinite}
+@keyframes neonOn{
+  0%{color:#7a0e14;text-shadow:2px 2px 0 rgba(255,255,255,.55),-1px -1px 0 rgba(255,255,255,.55),1px -1px 0 rgba(255,255,255,.55),-1px 1px 0 rgba(255,255,255,.55),4px 5px 0 rgba(0,0,0,.6)}
+  8%{color:#ff2a3a;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 0 6px #ff3344,0 0 14px #ff1a2e,0 0 26px rgba(255,20,40,.85),0 0 46px rgba(255,20,40,.55),4px 5px 0 rgba(0,0,0,.6)}
+  13%{color:#7a0e14;text-shadow:2px 2px 0 rgba(255,255,255,.55),-1px -1px 0 rgba(255,255,255,.55),1px -1px 0 rgba(255,255,255,.55),-1px 1px 0 rgba(255,255,255,.55),4px 5px 0 rgba(0,0,0,.6)}
+  24%{color:#ff2a3a;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 0 4px #ff3344,0 0 10px #ff1a2e,0 0 20px rgba(255,20,40,.7),0 0 34px rgba(255,20,40,.4),4px 5px 0 rgba(0,0,0,.6)}
+  28%{color:#7a0e14;text-shadow:2px 2px 0 rgba(255,255,255,.55),-1px -1px 0 rgba(255,255,255,.55),1px -1px 0 rgba(255,255,255,.55),-1px 1px 0 rgba(255,255,255,.55),4px 5px 0 rgba(0,0,0,.6)}
+  40%{color:#ff2a3a;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 0 6px #ff3344,0 0 14px #ff1a2e,0 0 26px rgba(255,20,40,.85),0 0 46px rgba(255,20,40,.55),4px 5px 0 rgba(0,0,0,.6)}
+  44%{color:#9a1219;text-shadow:2px 2px 0 rgba(255,255,255,.55),-1px -1px 0 rgba(255,255,255,.55),1px -1px 0 rgba(255,255,255,.55),-1px 1px 0 rgba(255,255,255,.55),4px 5px 0 rgba(0,0,0,.6)}
+  52%,100%{color:#ff2a3a;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 0 6px #ff3344,0 0 14px #ff1a2e,0 0 26px rgba(255,20,40,.85),0 0 46px rgba(255,20,40,.55),4px 5px 0 rgba(0,0,0,.6)}
+}
+@keyframes neonHum{
+  0%,100%{color:#ff2a3a;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 0 6px #ff3344,0 0 14px #ff1a2e,0 0 26px rgba(255,20,40,.85),0 0 46px rgba(255,20,40,.55),4px 5px 0 rgba(0,0,0,.6)}
+  45%{color:#f5202f;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 0 4px #ff3344,0 0 10px #ff1a2e,0 0 20px rgba(255,20,40,.7),0 0 34px rgba(255,20,40,.4),4px 5px 0 rgba(0,0,0,.6)}
+  88%{color:#ff2a3a;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 0 6px #ff3344,0 0 14px #ff1a2e,0 0 26px rgba(255,20,40,.85),0 0 46px rgba(255,20,40,.55),4px 5px 0 rgba(0,0,0,.6)}
+  90%{color:#8a1017;text-shadow:2px 2px 0 rgba(255,255,255,.55),-1px -1px 0 rgba(255,255,255,.55),1px -1px 0 rgba(255,255,255,.55),-1px 1px 0 rgba(255,255,255,.55),4px 5px 0 rgba(0,0,0,.6)}
+  91.5%{color:#ff2a3a;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 0 6px #ff3344,0 0 14px #ff1a2e,0 0 26px rgba(255,20,40,.85),0 0 46px rgba(255,20,40,.55),4px 5px 0 rgba(0,0,0,.6)}
+  92.5%{color:#8a1017;text-shadow:2px 2px 0 rgba(255,255,255,.55),-1px -1px 0 rgba(255,255,255,.55),1px -1px 0 rgba(255,255,255,.55),-1px 1px 0 rgba(255,255,255,.55),4px 5px 0 rgba(0,0,0,.6)}
+  94%{color:#ff2a3a;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 0 6px #ff3344,0 0 14px #ff1a2e,0 0 26px rgba(255,20,40,.85),0 0 46px rgba(255,20,40,.55),4px 5px 0 rgba(0,0,0,.6)}
+}
+@media (prefers-reduced-motion:reduce){.logo.neon,.logo.neon.lit{animation:none;color:#ff2a3a;text-shadow:2px 2px 0 #fff,-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,0 0 6px #ff3344,0 0 14px #ff1a2e,0 0 26px rgba(255,20,40,.85),0 0 46px rgba(255,20,40,.55),4px 5px 0 rgba(0,0,0,.6)}}
 .divider{width:1px;height:30px;background:rgba(255,255,255,.15)}
 .tag{display:flex;flex-direction:column;gap:2px}
 .tag b{font-family:Anton,sans-serif;font-weight:400;letter-spacing:.16em;font-size:16px}
@@ -759,7 +783,7 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
 <div class="app">
   <header>
     <div class="brand">
-      <div class="logo">Italia</div>
+      <div class="logo neon" id="logoTop">Italia</div>
       <div class="divider"></div>
       <div class="tag"><b>Arma tu pizza</b><span>PIZZA PERSONAL · 27 CM · SINCELEJO</span></div>
     </div>
@@ -890,7 +914,7 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
 
 <!-- Escena final -->
 <div class="scene" id="scene">
-  <div class="sceneTop"><div class="logo">Italia</div><button class="backTop" id="backTop" aria-label="Volver a armar"><i data-i="chevL"></i>Volver</button></div>
+  <div class="sceneTop"><div class="logo neon" id="logoScene">Italia</div><button class="backTop" id="backTop" aria-label="Volver a armar"><i data-i="chevL"></i>Volver</button></div>
   <div class="box3d" id="box3d">
     <div class="cutCap" id="cutCap" aria-live="polite"></div>
     <div class="rig">
@@ -1641,6 +1665,7 @@ function oven() {
   }, 5100);
 }
 function openScene(animated) {
+  lightLogo($('#logoScene'), 250);
   const scene=$('#scene'), bp=$('#boxPizza'), lid=$('#lid'), card=$('#card'), box=$('#box3d'), tart=$('#tartara');
   renderOrder(); refresh();
   if (animated) {
@@ -1690,6 +1715,7 @@ function knifeCut(host, lines, after) {
   return T;
 }
 function checkoutScene() {
+  lightLogo($('#logoScene'), 250);
   const it = [...st.cart].reverse().find(x => x._snap);
   if (!it) { openScene(false); return; }
   const scene=$('#scene'), bp=$('#boxPizza'), lid=$('#lid'), card=$('#card'), box=$('#box3d'), tart=$('#tartara'), cap=$('#cutCap');
@@ -1938,6 +1964,8 @@ $('#wa').addEventListener('click', () => {
   track('pedido_enviado', {...resumenPedido(), tiene_notas: !!$('#fNote').value.trim(), entrega: st.entrega, pago: st.pago, fuera_de_horario: !isOpen(), pedido: st.orderId});
 });
 
+/* Enciende el letrero LED del logo */
+function lightLogo(el, delay=0) { if (!el) return; el.classList.remove('lit'); void el.offsetWidth; setTimeout(()=>el.classList.add('lit'), delay); }
 /* Bienvenida */
 const intro = $('#intro');
 const SALUDO = ['Hola, soy Niko, de Sincelejo, Sucre.', 'Armemos tu pizza.'];
@@ -1954,12 +1982,13 @@ function showIntro() {
 }
 function hideIntro() {
   if (!intro.classList.contains('show') || intro.classList.contains('leave')) return;
-  intro.classList.add('leave'); sfx.start(); vibrate(15); gc('inicio'); track('bienvenida_completada');
+  intro.classList.add('leave'); lightLogo($('#logoTop'), 500); sfx.start(); vibrate(15); gc('inicio'); track('bienvenida_completada');
   setTimeout(()=>{ intro.classList.remove('show','leave'); if (!st.sauce && !st.baked) autoBase(true); setTimeout(()=>nikoSays(isMobile() ? NIKO_DICE.inicio.celular : NIKO_DICE.inicio.pc), 1100); }, 650);
   try { sessionStorage.setItem('italia_intro','1'); } catch(e) {}
   if (KIOSCO) { try { if (canFS && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); } catch(e){} }
 }
 intro.addEventListener('click', hideIntro);
+setTimeout(()=>{ if (!intro.classList.contains('show')) lightLogo($('#logoTop')); }, 400);
 
 /* ================= Modo restaurante (kiosco) ================= */
 const canFS = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
