@@ -769,6 +769,24 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.closedBar .ticker{animation-duration:40s}}
 
+
+/* ================= Botón "Al horno": cristal rojo ================= */
+#bake{position:relative;overflow:hidden;isolation:isolate;color:#fff;border:1px solid rgba(255,190,190,.55);
+  background:linear-gradient(180deg,rgba(255,105,112,.92) 0%,rgba(255,28,46,.86) 45%,rgba(214,0,24,.9) 100%);
+  -webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);
+  box-shadow:0 14px 34px rgba(255,10,30,.45),0 0 0 1px rgba(120,0,10,.55),inset 0 1px 0 rgba(255,255,255,.75),inset 0 -8px 16px rgba(120,0,10,.35),inset 0 0 22px rgba(255,150,150,.35),0 0 28px rgba(255,30,50,.35);
+  text-shadow:0 1px 2px rgba(80,0,6,.55);font-weight:800;letter-spacing:.02em;transition:transform .15s,box-shadow .25s,filter .25s}
+#bake::before{content:'';position:absolute;left:6%;right:6%;top:2px;height:46%;border-radius:999px 999px 40% 40%/100% 100% 60% 60%;z-index:-1;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.06));pointer-events:none}
+#bake::after{content:'';position:absolute;top:-30%;bottom:-30%;width:38%;left:-60%;z-index:1;pointer-events:none;transform:skewX(-22deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:bakeGlint 4.2s cubic-bezier(.4,0,.2,1) 1.2s infinite}
+@keyframes bakeGlint{0%{left:-60%}28%,100%{left:130%}}
+#bake i{filter:drop-shadow(0 0 6px rgba(255,210,120,.95));color:#fff3c4}
+#bake:hover{filter:brightness(1.08) saturate(1.1);box-shadow:0 18px 40px rgba(255,10,30,.55),0 0 0 1px rgba(120,0,10,.55),inset 0 1px 0 rgba(255,255,255,.8),inset 0 -10px 18px rgba(90,0,8,.45),inset 0 0 26px rgba(255,140,140,.35)}
+#bake:active{transform:scale(.96)}
+#bake:disabled{filter:grayscale(.4) brightness(.8)}
+#bake:disabled::after{animation:none}
+@media (prefers-reduced-motion:reduce){#bake::after{animation:none}}
 /* ================= Pantalla de carga con Niko ================= */
 .splash{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,2.6vh,22px);
   background:radial-gradient(ellipse 55% 42% at 50% 42%,rgba(227,18,27,.16),transparent 70%),#0b0a0a;animation:spSafe .01s 9s forwards}
@@ -2559,14 +2577,17 @@ async function sharePizza(origen) {
     nc.putImageData(id, 0, 0); ctx.fillStyle = ctx.createPattern(nz, 'repeat'); ctx.fillRect(0, 0, W, H);
     const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
     const file = new File([blob], 'mi-pizza-italia.png', {type:'image/png'});
-    const url = location.origin + location.pathname;
+    const url = 'https://italiasincelejo.github.io';
+    const msg = `¡Mira la pizza que armé en Italia Sincelejo! 🍕 Arma la tuya aquí: ${url}`;
+    // algunos celulares (iPhone con WhatsApp) no pasan el texto junto a la imagen: también queda copiado para pegarlo
+    try { await navigator.clipboard.writeText(msg); } catch(e) {}
     if (navigator.canShare && navigator.canShare({files:[file]})) {
-      await navigator.share({files:[file], title:'Mi pizza en Italia', text:`Armé mi pizza en Italia Sincelejo. Arma la tuya: ${url}`}).catch(()=>{});
+      toast('El enlace quedó copiado: pégalo en el mensaje si no aparece'); await navigator.share({files:[file], title:'Mi pizza en Italia', text: msg}).catch(()=>{});
       track('pizza_compartida', {metodo:'compartir', origen});
     } else {
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'mi-pizza-italia.png'; document.body.appendChild(a); a.click();
       setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 2000);
-      toast('Imagen descargada: súbela a tus historias'); track('pizza_compartida', {metodo:'descarga', origen});
+      toast('Imagen descargada y enlace copiado: pégalo al compartir'); track('pizza_compartida', {metodo:'descarga', origen});
     }
   } catch(e) { toast('No se pudo crear la imagen en este equipo'); }
 }
