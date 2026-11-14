@@ -770,17 +770,14 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
 @media (prefers-reduced-motion:reduce){.closedBar .ticker{animation-duration:40s}}
 
 
-/* ================= Botón "Al horno": cristal rojo ================= */
-#bake{position:relative;overflow:hidden;isolation:isolate;color:#fff;border:1px solid rgba(255,190,190,.55);
-  background:linear-gradient(180deg,#ff4a55 0%,#ff1428 50%,#f0001a 100%);
-  -webkit-backdrop-filter:blur(14px) saturate(1.6);backdrop-filter:blur(14px) saturate(1.6);
-  box-shadow:0 6px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -6px 12px rgba(150,0,12,.3);
-  text-shadow:0 1px 2px rgba(80,0,6,.55);font-weight:800;letter-spacing:.02em;transition:transform .15s,box-shadow .25s,filter .25s}
-#bake::before{content:'';position:absolute;left:6%;right:6%;top:2px;height:46%;border-radius:999px 999px 40% 40%/100% 100% 60% 60%;z-index:-1;
-  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.06));pointer-events:none}
+/* ================= Botón "Al horno": rojo vivo, acabado limpio ================= */
+#bake{position:relative;color:#fff;border:1px solid #c8001a;font-weight:800;letter-spacing:.01em;
+  background:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 48%,rgba(255,255,255,0) 52%),linear-gradient(180deg,#ff2337 0%,#f2001c 100%);
+  box-shadow:0 8px 18px rgba(240,0,28,.28),0 2px 4px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(120,0,12,.35);
+  text-shadow:0 1px 1px rgba(110,0,10,.45);transition:transform .12s,filter .2s,box-shadow .2s}
 #bake i{color:#fff}
-#bake:hover{filter:brightness(1.05)}
-#bake:active{transform:scale(.96)}
+#bake:hover{filter:brightness(1.06)}
+#bake:active{transform:translateY(1px) scale(.98);box-shadow:0 4px 10px rgba(240,0,28,.25),inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(120,0,12,.35)}
 #bake:disabled{filter:grayscale(.4) brightness(.8)}
 /* ================= Pantalla de carga con Niko ================= */
 .splash{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,2.6vh,22px);
