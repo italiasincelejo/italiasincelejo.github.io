@@ -2156,7 +2156,9 @@ function openIng(id) {
   $('#isheet').classList.add('show'); $('#isback').classList.add('show'); sfx.tap && sfx.tap();
 }
 function closeIng() { $('#isheet').classList.remove('show'); $('#isback').classList.remove('show'); ingOpen = null; }
-$('#isback').onclick = () => { if (Date.now() - ingAt > 450) closeIng(); };   // evita que el mismo toque la cierre $('#isClose').onclick = closeIng;
+$('#isback').onclick = () => { if (Date.now() - ingAt > 450) closeIng(); };   // evita que el mismo toque la cierre
+$('#isClose').onclick = () => { closeIng(); sfx.whoosh && sfx.whoosh(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && ingOpen) closeIng(); });
 document.querySelectorAll('#isheet .opt').forEach(b => b.onclick = () => {
   const id = ingOpen; if (!id) return; const o = b.dataset.o, before = st.tops[id] || 0;
   closeIng();
