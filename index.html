@@ -2224,6 +2224,10 @@ $('#moreDrinks').onclick = () => { allDrinks = !allDrinks; renderDrinks(); };
 
 /* ================= Entrega y pago ================= */
 function paintSegs() {
+  // el domiciliario no lleva datáfono: esa opción solo aparece si la persona recoge en el local
+  const domi = st.entrega !== 'recoger';
+  if (domi && st.pago === 'datafono') { st.pago = ''; if (!KIOSCO) store.set('italia_pago', ''); toast('El datáfono solo está disponible si recoges en el local. Elige llave o efectivo.'); }
+  $('.segs[data-k="pago"] [data-v="datafono"]').style.display = domi ? 'none' : '';
   document.querySelectorAll('.segs[data-k] button').forEach(b => b.classList.toggle('on', st[b.parentNode.dataset.k] === b.dataset.v));
   $('#fAddr').style.display = st.entrega === 'recoger' ? 'none' : '';
   $('#payInfo').innerHTML = st.pago === 'llave' ? payHTML() : '';
