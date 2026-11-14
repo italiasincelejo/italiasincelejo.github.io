@@ -1809,7 +1809,7 @@ void main(){
     f*=1.-smoothstep(.8,1.05,length(vec2(d.x,min(d.y,max(sweep,-1.)))));
     f*=smoothstep(-1.15,-.95,d.y);
   }
-  f*=env*(1.-smoothstep(.8,1.,uv.y));
+  f*=env*(1.-smoothstep(.8,1.,uv.y))*smoothstep(0.,.14,uv.x)*smoothstep(1.,.86,uv.x);
   f=clamp(f,0.,1.);
   vec3 c=vec3(1.45*f+.15,.95*f*f,.5*f*f*f*f);
   c=mix(c,vec3(1.,.97,.85),smoothstep(.85,1.,f)*.4);
