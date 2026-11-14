@@ -2177,7 +2177,7 @@ if (KIOSCO) {
   const kick = () => { clearTimeout(idle); idle = setTimeout(resetAll, KIOSCO_INACTIVIDAD_SEG*1000); };
   ['pointerdown','keydown','touchstart'].forEach(ev => window.addEventListener(ev, kick, {passive:true}));
   showIntro(); kick();
-} else if (!seen) showIntro();
+}
 
 
 /* ================= Pantalla de carga con Niko =================
@@ -2201,10 +2201,12 @@ if (KIOSCO) {
     sp.classList.add('full');
     setTimeout(() => sp.classList.add('out'), 280);
     setTimeout(() => {
-      const target = intro.classList.contains('show') ? $('#introImg') : null, nk = $('#spNiko');
-      if (!target) { sp.classList.add('fade'); lightLogo($('#logoTop')); setTimeout(() => sp.remove(), 600); return; }
-      // Niko vuela desde el centro hasta su lugar en la bienvenida (una sola transición, sin duplicados)
-      showIntro(true); target.style.visibility = 'hidden'; sp.classList.add('gone');
+      const enIntro = intro.classList.contains('show'), nk = $('#spNiko');
+      const target = enIntro ? $('#introImg') : $('#buddyImg');
+      if (!enIntro) { lightLogo($('#logoTop')); setTimeout(() => nikoSays(isMobile() ? NIKO_DICE.inicio.celular : NIKO_DICE.inicio.pc), 750); track('app_abierta'); }
+      if (!target || !target.getBoundingClientRect().width) { sp.classList.add('fade'); setTimeout(() => sp.remove(), 600); return; }
+      // Niko vuela desde el centro hasta su lugar en la app (una sola transición, sin duplicados)
+      if (enIntro) showIntro(true); target.style.visibility = 'hidden'; sp.classList.add('gone');
       const a = nk.getBoundingClientRect(), b = target.getBoundingClientRect(), w = a.width / 1.14;
       nk.style.transition = 'transform .65s cubic-bezier(.6,0,.15,1)';
       nk.style.transform = `translate(${(b.left + b.width/2) - (a.left + a.width/2)}px, ${(b.top + b.height/2) - (a.top + a.height/2)}px) scale(${(b.width / w).toFixed(3)})`;
