@@ -1,4 +1,4 @@
-name: transcribir
+name: transcribir2
 on:
   push:
     branches: [fuentes]
