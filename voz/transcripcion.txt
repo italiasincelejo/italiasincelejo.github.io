@@ -1,0 +1,88 @@
+[  1.08-  3.32]  Y si armas tu pizza, tu manera
+      1.08-  1.80  Y
+      1.80-  1.94  si
+      1.94-  2.16  armas
+      2.16-  2.40  tu
+      2.40-  2.84  pizza,
+      3.00-  3.06  tu
+      3.06-  3.32  manera
+[  4.70-  9.14]  La base de tomate, mozzarella y finas hierbas ya va incluida
+      4.70-  5.42  La
+      5.42-  5.70  base
+      5.70-  5.88  de
+      5.88-  6.36  tomate,
+      6.62-  7.08  mozzarella
+      7.08-  7.44  y
+      7.44-  7.80  finas
+      7.80-  8.20  hierbas
+      8.20-  8.42  ya
+      8.42-  8.54  va
+      8.54-  9.14  incluida
+[  9.14- 11.70]  Tu antojo se anda ingrediente
+      9.14-  9.98  Tu
+      9.98- 10.48  antojo
+     10.48- 10.74  se
+     10.74- 10.86  anda
+     10.86- 11.70  ingrediente
+[ 11.70- 14.38]  Y el precio se actualiza al instante
+     11.70- 12.32  Y
+     12.32- 12.50  el
+     12.50- 12.88  precio
+     12.88- 13.16  se
+     13.16- 13.68  actualiza
+     13.68- 13.84  al
+     13.84- 14.38  instante
+[ 15.34- 17.06]  Peperón y doble? Dale
+     15.34- 16.06  Peperón
+     16.06- 16.16  y
+     16.16- 16.46  doble?
+     16.82- 17.06  Dale
+[ 18.00- 20.08]  Tienes 27 ingredientes para escoger
+     17.76- 18.12  Tienes
+     18.12- 18.54  27
+     18.54- 19.36  ingredientes
+     19.36- 19.54  para
+     19.54- 20.08  escoger
+[ 22.98- 23.70]  Valorno
+     22.98- 23.70  Valorno
+[ 24.48- 26.58]  Se corta en 6 porciones
+     24.48- 25.20  Se
+     25.20- 25.54  corta
+     25.54- 25.66  en
+     25.66- 25.86  6
+     25.86- 26.58  porciones
+[ 26.58- 28.18]  ¡Y lista!
+     26.58- 27.80  ¡Y
+     27.80- 28.18  lista!
+[ 28.18- 30.02]  Agregas tu bebida
+     28.18- 29.38  Agregas
+     29.38- 29.54  tu
+     29.54- 30.02  bebida
+[ 30.02- 32.34]  Eliges domicilio a recoger
+     30.02- 30.52  Eliges
+     30.52- 31.48  domicilio
+     31.48- 31.48  a
+     31.48- 32.34  recoger
+[ 32.34- 33.86]  ¿Y cómo vas a pagar?
+     32.34- 32.96  ¿Y
+     32.96- 33.18  cómo
+     33.18- 33.42  vas
+     33.42- 33.54  a
+     33.54- 33.86  pagar?
+[ 34.12- 35.28]  ¿Y tu pedido llega?
+     34.12- 34.18  ¿Y
+     34.18- 34.30  tu
+     34.30- 34.76  pedido
+     34.76- 35.28  llega?
+[ 35.84- 37.80]  Directo a nuestro whatsapp
+     35.84- 36.72  Directo
+     36.72- 36.82  a
+     36.82- 37.00  nuestro
+     37.00- 37.80  whatsapp
+[ 37.80- 40.36]  Italia Futco
+     37.80- 39.32  Italia
+     39.32- 40.36  Futco
+[ 40.36- 42.26]  Arma la tuya
+     40.36- 41.50  Arma
+     41.50- 41.66  la
+     41.66- 42.26  tuya
