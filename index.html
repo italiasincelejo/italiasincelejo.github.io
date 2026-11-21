@@ -1022,7 +1022,7 @@ body{font-family:var(--ui);-webkit-font-smoothing:antialiased}
     <h1>¿Y si armas<br>tu pizza<br><em>a tu manera?</em></h1>
     <p><span class="shine">Pizza personal de 27 cm.</span> Elige cada ingrediente, mírala salir del horno y pídela directo por WhatsApp.</p>
     <button class="btn go" id="introGo">Empezar<i data-i="arrow"></i></button>
-    <div class="feats"><span class="feat"><i data-i="layers"></i>27 ingredientes</span><span class="feat"><i data-i="tag"></i>Precio en tiempo real</span><span class="feat"><i data-i="chat"></i>Pedido por WhatsApp</span></div>
+    <div class="feats"><span class="feat"><i data-i="layers"></i>Ingredientes reales</span><span class="feat"><i data-i="tag"></i>Precio en tiempo real</span><span class="feat"><i data-i="chat"></i>Pedido por WhatsApp</span></div>
   </div>
   <div class="introFoot">PLAZA CULTURAL DE MAJAGUAL · SINCELEJO</div>
 </div>
@@ -1141,49 +1141,23 @@ const TOPS = {
   pepperoni:{name:'Pepperoni', cat:'proteina', grp:'carnes', n:13, size:13.5},
   jamon:{name:'Jamón', cat:'proteina', grp:'carnes', n:10, size:14.5},
   pollo:{name:'Pollo', cat:'proteina', grp:'carnes', n:14, size:11},
-  tocineta:{name:'Tocineta', cat:'proteina', grp:'carnes', n:10, size:14},
   chorizo:{name:'Chorizo', cat:'proteina', grp:'carnes', n:13, size:11.5},
-  salami:{name:'Salami', cat:'proteina', grp:'carnes', n:11, size:13},
-  ranchera:{name:'Ranchera', cat:'proteina', grp:'carnes', n:14, size:9.5},
-  carne:{name:'Carne molida', cat:'proteina', grp:'carnes', n:22, size:7.5},
   butifarra:{name:'Butifarra', cat:'proteina', grp:'carnes', n:13, size:11},
-  quesoextra:{name:'Queso extra', cat:'queso', grp:'quesos', layer:'cheese'},
-  parmesano:{name:'Parmesano', cat:'queso', grp:'quesos', layer:'parm'},
-  bufala:{name:'Queso de búfala', cat:'premium', grp:'quesos', n:8, size:13},
-  burrata:{name:'Burrata', cat:'premium', grp:'quesos', n:5, size:17},
-  porchetta:{name:'Porchetta', cat:'premium', grp:'quesos', n:9, size:14},
-  serrano:{name:'Jamón serrano', cat:'premium', grp:'quesos', n:8, size:16},
   champinones:{name:'Champiñones', cat:'vegetal', grp:'veg', n:13, size:11.5},
-  pimenton:{name:'Pimentón', cat:'vegetal', grp:'veg', n:14, size:12.5},
-  cebolla:{name:'Cebolla roja', cat:'vegetal', grp:'veg', n:12, size:12},
   tomate:{name:'Tomate fresco', cat:'vegetal', grp:'veg', n:8, size:14},
-  aceitunas:{name:'Aceitunas', cat:'vegetal', grp:'veg', n:17, size:7.5},
-  maiz:{name:'Maíz', cat:'vegetal', grp:'veg', n:20, size:6},
-  rugula:{name:'Rúgula', cat:'vegetal', grp:'veg', n:13, size:13},
-  pina:{name:'Piña caramelizada', cat:'fruta', grp:'extras', n:13, size:10},
-  uvas:{name:'Uvas pasas', cat:'fruta', grp:'extras', n:20, size:5.5},
-  picante:{name:'Salsa picante', cat:'salsa', grp:'extras', drizzle:'#d7261b'},
-  miel:{name:'Miel picante', cat:'salsa', grp:'extras', drizzle:'#e8a420'},
-  balsamico:{name:'Reducción de balsámico', cat:'salsa', grp:'extras', drizzle:'#3b1d12'}
+  pina:{name:'Piña caramelizada', cat:'fruta', grp:'veg', n:13, size:10}
 };
-const GROUPS = {carnes:['L','CARNES','Carnes'], quesos:['L','QUESOS Y GOURMET','Quesos y gourmet'], veg:['R','VEGETALES','Vegetales'], extras:['R','FRUTA Y SALSAS','Fruta y salsas']};
+const GROUPS = {carnes:['L','CARNES','Carnes'], veg:['R','VEGETALES Y FRUTA','Vegetales y fruta']};
 /* Pizzas de la casa (carta oficial de Treinta). Precio de carta; agregar ingredientes suma, quitar no descuenta. */
 const CASA = {
   alicia:{name:'Alicia Dorada', price:13000, tops:['jamon','pina']},
   gitana:{name:'Gitana', price:13000, tops:['jamon']},
   matildelina:{name:'Matildelina', price:13000, tops:['chorizo','jamon']},
   senora:{name:'Señora', price:13000, tops:['tomate']},
-  mananitas:{name:'Mañanitas de invierno', price:14000, tops:['cebolla','pimenton','champinones','tomate']},
-  sanandresana:{name:'Sanandresana', price:17000, tops:['salami','pollo','pimenton']},
   companera:{name:'Compañera', price:17000, tops:['pollo','champinones']},
   simulacion:{name:'Simulación', price:17000, tops:['pollo','champinones']},
   lasanta:{name:'La Santa', price:20000, tops:['chorizo','jamon','butifarra','pollo']},
-  obsesion:{name:'Obsesión', price:20000, tops:['ranchera','carne','cebolla','picante']},
-  caprichosa:{name:'Caprichosa', price:20000, tops:['parmesano','jamon','tocineta','pimenton','aceitunas','uvas']},
-  prosciutto:{name:'Prosciutto e Fungui', price:20000, tops:['bufala','serrano','rugula','balsamico']},
-  porcheta:{name:'Porcheta', price:20000, tops:['porchetta','rugula','parmesano','miel']},
-  peperoni:{name:'Peperoni', price:20000, tops:['pepperoni','burrata','parmesano']},
-  italiana:{name:'Italiana', price:24000, tops:['jamon','pepperoni','ranchera','tocineta','salami','maiz','pollo']}
+  peperoni:{name:'Peperoni', price:20000, tops:['pepperoni']}
 };
 /* Bebidas (precios de Treinta). Las 6 primeras se muestran de una vez; el resto en "Ver todas". */
 const BEBIDAS = [
@@ -1206,7 +1180,7 @@ function orderId() {
 }
 const PAGOS = {llave:'Transferencia por llave', efectivo:'Efectivo', datafono:'Datáfono (Bold)'};
 /* Etiqueta "Favorito": se puede actualizar con lo que más se vende (datos de PostHog o de la caja). */
-const FAVORITOS = { ingredientes:['jamon','pollo','pepperoni'], casa:['alicia','italiana','lasanta'] };
+const FAVORITOS = { ingredientes:['jamon','pollo','pepperoni'], casa:['alicia','lasanta','peperoni'] };
 const HORARIO = { abre: 17*60, cierra: 23*60+30, texto: '5:00 p. m. a 11:30 p. m.', descanso: 3 };   // descanso: 3 = miércoles (0 = domingo)
 const DIRECCION_LOCAL = 'Plaza Cultural de Majagual, Sincelejo';
 const BASES = [
@@ -2402,8 +2376,10 @@ function restoreOrder() {
     const o = JSON.parse(localStorage.getItem('italia_pedido') || 'null'); if (!o || !Array.isArray(o.cart)) return;
     const sent = +store.get('italia_enviado') || 0;
     if (Date.now() - o.at > 12*3600e3 || sent > o.at) { localStorage.removeItem('italia_pedido'); return; }
-    st.cart = o.cart.filter(it => it && it.tops && Object.keys(it.tops).every(id => TOPS[id]))
-      .map(it => ({tops: it.tops, qty: Math.max(1, Math.min(20, +it.qty || 1)), house: CASA[it.house] ? it.house : null}));
+    // si la carta cambió, se quitan los ingredientes o pizzas que ya no existen sin perder el resto del pedido
+    st.cart = o.cart.filter(it => it && it.tops && (!it.house || CASA[it.house]))
+      .map(it => ({tops: Object.fromEntries(Object.entries(it.tops).filter(([id]) => TOPS[id])), qty: Math.max(1, Math.min(20, +it.qty || 1)), house: CASA[it.house] ? it.house : null}))
+      .filter(it => it.house || Object.keys(it.tops).length);
     st.drinks = Object.fromEntries(Object.entries(o.drinks || {}).filter(([k,q]) => bebOf(k) && q > 0));
     if (typeof o.id === 'string' && /^[A-Z0-9]{4}$/.test(o.id)) st.orderId = o.id;
     if (st.cart.length) setTimeout(()=>toast(`Tu pedido sigue aquí · ${fmt(orderTotal())}`), 900);
