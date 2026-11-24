@@ -1143,15 +1143,18 @@ const TOPS = {
   pollo:{name:'Pollo', cat:'proteina', grp:'carnes', n:14, size:11},
   chorizo:{name:'Chorizo', cat:'proteina', grp:'carnes', n:13, size:11.5},
   butifarra:{name:'Butifarra', cat:'proteina', grp:'carnes', n:13, size:11},
+  tocineta:{name:'Tocineta', cat:'proteina', grp:'carnes', n:10, size:14},
+  salami:{name:'Salami', cat:'proteina', grp:'carnes', n:11, size:13},
+  ranchera:{name:'Ranchera', cat:'proteina', grp:'carnes', n:14, size:9.5},
   quesoextra:{name:'Mozzarella extra', price:4000, cat:'queso', grp:'quesos', layer:'cheese'},
-  parmesano:{name:'Parmesano', price:5000, cat:'queso', grp:'quesos', layer:'parm'},
-  bufala:{name:'Queso de búfala', price:6000, cat:'premium', grp:'quesos', n:8, size:13},
   champinones:{name:'Champiñones', cat:'vegetal', grp:'veg', n:13, size:11.5},
   tomate:{name:'Tomate fresco', cat:'vegetal', grp:'veg', n:8, size:14},
   maiz:{name:'Maíz', cat:'vegetal', grp:'veg', n:20, size:6},
-  pina:{name:'Piña caramelizada', cat:'fruta', grp:'veg', n:13, size:10}
+  pina:{name:'Piña caramelizada', cat:'fruta', grp:'veg', n:13, size:10},
+  miel:{name:'Miel picante', cat:'salsa', grp:'salsas', drizzle:'#e8a420'},
+  balsamico:{name:'Reducción de balsámico', cat:'salsa', grp:'salsas', drizzle:'#3b1d12'}
 };
-const GROUPS = {carnes:['L','CARNES','Carnes'], quesos:['L','QUESOS','Quesos'], veg:['R','VEGETALES Y FRUTA','Vegetales y fruta']};
+const GROUPS = {carnes:['L','CARNES','Carnes'], quesos:['L','QUESOS','Quesos'], veg:['R','VEGETALES Y FRUTA','Vegetales y fruta'], salsas:['R','SALSAS','Salsas']};
 /* Pizzas de la casa (carta oficial de Treinta). Precio de carta; agregar ingredientes suma, quitar no descuenta. */
 const CASA = {
   alicia:{name:'Alicia Dorada', price:13000, tops:['jamon','pina']},
@@ -1161,7 +1164,7 @@ const CASA = {
   companera:{name:'Compañera', price:17000, tops:['pollo','jamon']},
   simulacion:{name:'Simulación', price:17000, tops:['pollo','champinones']},
   lasanta:{name:'La Santa', price:20000, tops:['chorizo','jamon','butifarra','pollo','maiz']},
-  peperoni:{name:'Peperoni', price:20000, tops:['pepperoni','parmesano','bufala']}
+  peperoni:{name:'Peperoni', price:20000, tops:['pepperoni']}
 };
 /* Bebidas (precios de Treinta). Las 6 primeras se muestran de una vez; el resto en "Ver todas". */
 const BEBIDAS = [
