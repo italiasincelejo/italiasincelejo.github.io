@@ -1138,9 +1138,9 @@ const ICON = {   // íconos pequeños para la base en la bandeja del celular
 
 /* ================= Adiciones (menú de Italia) ================= */
 const TOPS = {
-  pepperoni:{name:'Pepperoni', cat:'proteina', grp:'carnes', n:13, size:13.5},
+  pepperoni:{name:'Pepperoni', price:4000, cat:'proteina', grp:'carnes', n:13, size:13.5},
   jamon:{name:'Jamón', cat:'proteina', grp:'carnes', n:10, size:14.5},
-  pollo:{name:'Pollo', cat:'proteina', grp:'carnes', n:14, size:11},
+  pollo:{name:'Pollo', price:3000, cat:'proteina', grp:'carnes', n:14, size:11},
   chorizo:{name:'Chorizo', cat:'proteina', grp:'carnes', n:13, size:11.5},
   butifarra:{name:'Butifarra', cat:'proteina', grp:'carnes', n:13, size:11},
   tocineta:{name:'Tocineta', cat:'proteina', grp:'carnes', n:10, size:14},
@@ -1164,7 +1164,7 @@ const CASA = {
   companera:{name:'Compañera', price:17000, tops:['pollo','jamon']},
   simulacion:{name:'Simulación', price:17000, tops:['pollo','champinones']},
   lasanta:{name:'La Santa', price:20000, tops:['chorizo','jamon','butifarra','pollo','maiz']},
-  peperoni:{name:'Peperoni', price:20000, tops:['pepperoni']}
+  peperoni:{name:'Peperoni', price:20000, tops:['pepperoni','pepperoni']}   // doble pepperoni incluido
 };
 /* Bebidas (precios de Treinta). Las 6 primeras se muestran de una vez; el resto en "Ver todas". */
 const BEBIDAS = [
@@ -1571,11 +1571,13 @@ function loadPizza(i) {   // carga una pizza del pedido en la masa para editarla
 }
 
 /* ================= Pedido ================= */
-const recipe = house => (house && CASA[house]) ? CASA[house].tops : [];
+const recipe = house => (house && CASA[house]) ? [...new Set(CASA[house].tops)] : [];
+const recQty = (house, id) => (house && CASA[house]) ? CASA[house].tops.filter(x => x === id).length : 0;   // 2 = viene doble en la receta
+const recName = (cid, tops) => [...new Set(CASA[cid].tops)].filter(id => !tops || tops[id]).map(id => TOPS[id].name + (recQty(cid, id) > 1 && (!tops || tops[id] > 1) ? ' (doble)' : '')).join(', ');
 const linesOf = (tops, house) => {   // adiciones que se cobran
   const rec = recipe(house), out = [];
   for (const [id,c] of Object.entries(tops)) {
-    const inc = rec.includes(id) ? 1 : 0, extra = c - inc;
+    const inc = recQty(house, id), extra = c - inc;
     if (extra > 0) out.push({id, name: TOPS[id].name + (inc ? ' extra' : (c>1 ? ' (doble)' : '')), price: price(id)*extra});
   }
   return out;
@@ -1591,7 +1593,7 @@ const drinksTotal = () => drinksList().reduce((a,d)=>a+d.price,0);
 const orderTotal = () => cartTotal() + drinksTotal();
 const descOf = (tops, house) => {
   const l = linesOf(tops, house).map(x=>'+ '+x.name), sin = sinOf(tops, house).map(n=>'sin '+n.toLowerCase());
-  if (house) return [CASA[house].tops.filter(id=>tops[id]).map(id=>TOPS[id].name).join(', ')].concat(l, sin).filter(Boolean).join(' · ');
+  if (house) return [recName(house, tops)].concat(l, sin).filter(Boolean).join(' · ');
   return l.length ? linesOf(tops).map(x=>x.name).join(', ') : 'Solo la base: tomate, mozzarella y finas hierbas';
 };
 const titleOf = (it, i) => `Pizza ${i+1}${it.house && CASA[it.house] ? ' · ' + CASA[it.house].name : ''}`;
@@ -2226,8 +2228,9 @@ function openIng(id) {
   ingOpen = id; ingAt = Date.now(); const t = TOPS[id], c = st.tops[id] || 0, inRec = recipe(st.house).includes(id);
   $('#isArt').innerHTML = ART[id]();
   $('#isName').textContent = t.name;
-  $('#isPrice').textContent = inRec ? `Incluido en la ${CASA[st.house].name}` : `+ ${fmt(price(id))} la porción`;
-  $('#isDoble').textContent = '+' + fmt(price(id));
+  const dobleInc = recQty(st.house, id) > 1;
+  $('#isPrice').textContent = inRec ? (dobleInc ? `Doble porción incluida en la ${CASA[st.house].name}` : `Incluido en la ${CASA[st.house].name}`) : `+ ${fmt(price(id))} la porción`;
+  $('#isDoble').textContent = dobleInc ? 'Incluida' : '+' + fmt(price(id));
   document.querySelectorAll('#isheet .opt').forEach(b => b.classList.toggle('on', (b.dataset.o==='normal'&&c===1) || (b.dataset.o==='doble'&&c===2)));
   $('#isheet .opt.danger').lastChild.textContent = inRec ? 'Quitar (no cambia el precio)' : 'Quitar';
   $('#isheet').classList.add('show'); $('#isback').classList.add('show'); sfx.tap && sfx.tap();
@@ -2249,7 +2252,7 @@ $('#chips').addEventListener('click', e => { const c = e.target.closest('.chip[d
 $('#casaList').innerHTML = Object.entries(CASA).map(([cid,c]) => `
   <button class="casa" data-c="${cid}">
     <div class="cart3">${c.tops.slice(0,3).map(id=>`<span>${ART[id]()}</span>`).join('')}</div>
-    <div class="cinfo"><b>${c.name}${FAVORITOS.casa.includes(cid)?'<em class="fav">Favorita</em>':''}</b><small>${c.tops.map(id=>TOPS[id].name).join(', ')}</small></div>
+    <div class="cinfo"><b>${c.name}${FAVORITOS.casa.includes(cid)?'<em class="fav">Favorita</em>':''}</b><small>${recName(cid)}</small></div>
     <span class="cpr">${fmt(c.price)}</span>
   </button>`).join('');
 let casaAt = 0;
